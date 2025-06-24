@@ -10,7 +10,7 @@ import java.util.Collection;
 public abstract class ChessMovesCalculator {
     public abstract Collection<ChessMove> getPossibleMoves(ChessBoard board, ChessPosition myPosition);
 
-    private boolean IsValid(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
+    private boolean IsValidMove(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
         boolean isValid = true;
         //check move ends on the board
 
@@ -41,81 +41,37 @@ public abstract class ChessMovesCalculator {
         return isValid;
     }
 
+    // TODO some bug in here when going down and right
     protected Collection<ChessMove> validateDiagonals(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> possibleDiagonals = new ArrayList<>();
-        int rowModifier;
-        int colModifier;
+        int[][] directions = {
+                {1, 1},  // upper right
+                {-1, 1},  // lower right
+                {-1, -1}, // lower left
+                {1, -1}  // upper left
+        };
 
-        //check upper left diagonals
-        rowModifier = 0;
-        colModifier = 0;
-        while (true) {
+        for (int[] direction : directions) {
+            int row = myPosition.getRow();
+            int col = myPosition.getColumn();
+            while (true) {
+                row += direction[0];
+                col += direction[1];
 
-            rowModifier += 1;
-            colModifier -= 1;
+                ChessPosition positionToValidate = new ChessPosition(row, col);
 
-            ChessPosition positionToValidate = new ChessPosition(myPosition.getRow() + rowModifier, myPosition.getColumn() + colModifier);
+                if (!IsValidMove(board, myPosition, positionToValidate)) {
+                    break;
+                }
 
-            if (!IsValid(board, myPosition, positionToValidate)) {
-                break;
+                possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
             }
-
-            possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
-        }
-
-        //check upper right diagonals
-        rowModifier = 0;
-        colModifier = 0;
-        while (true) {
-
-            rowModifier += 1;
-            colModifier += 1;
-
-            ChessPosition positionToValidate = new ChessPosition(myPosition.getRow() + rowModifier, myPosition.getColumn() + colModifier);
-
-            if (!IsValid(board, myPosition, positionToValidate)) {
-                break;
-            }
-
-            possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
-        }
-
-        //check lower left diagonals
-        rowModifier = 0;
-        colModifier = 0;
-        while (true) {
-
-            rowModifier -= 1;
-            colModifier -= 1;
-
-            ChessPosition positionToValidate = new ChessPosition(myPosition.getRow() + rowModifier, myPosition.getColumn() + colModifier);
-
-            if (!IsValid(board, myPosition, positionToValidate)) {
-                break;
-            }
-
-            possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
-        }
-
-        //check lower right diagonals
-        rowModifier = 0;
-        colModifier = 0;
-        while (true) {
-
-            rowModifier -= 1;
-            colModifier += 1;
-
-            ChessPosition positionToValidate = new ChessPosition(myPosition.getRow() + rowModifier, myPosition.getColumn() + colModifier);
-
-            if (!IsValid(board, myPosition, positionToValidate)) {
-                break;
-            }
-
-            possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
         }
 
 
         return possibleDiagonals;
     }
+
+
 }
 
