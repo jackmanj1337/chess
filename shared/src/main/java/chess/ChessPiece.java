@@ -16,10 +16,19 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    private int distanceMoved = 0;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    public int getDistanceMoved() {
+        return distanceMoved;
+    }
+
+    public void setDistanceMoved(int distanceMoved) {
+        this.distanceMoved = distanceMoved;
     }
 
     /**
@@ -69,7 +78,30 @@ public class ChessPiece {
         return calculator.getPossibleMoves(board, myPosition);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessPiece that)) {
+            return false;
+        }
+        return getDistanceMoved() == that.getDistanceMoved() && pieceColor == that.pieceColor && type == that.type;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type, getDistanceMoved());
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                ", distanceMoved=" + distanceMoved +
+                '}';
+    }
+}
+
+/*
     @Override
     public boolean equals(Object comparisonTarget) {
         if (comparisonTarget == this) {
@@ -95,3 +127,4 @@ public class ChessPiece {
         return Objects.hash(pieceColor, type);
     }
 }
+ */

@@ -9,18 +9,22 @@ import java.util.Collection;
 import java.util.Objects;
 
 public abstract class ChessMovesCalculator {
+    protected enum TargetSquare {VALID_TARGET, INVALID_TARGET}
+
+    protected enum Capture {CAPTURE, NO_CAPTURE}
+
     public abstract Collection<ChessMove> getPossibleMoves(ChessBoard board, ChessPosition myPosition);
 
-    protected String[] IsValidMove(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
-        String[] results = {"valid target", "no capture"};
+    protected Object[] IsValidMove(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
+        Object[] results = {TargetSquare.VALID_TARGET, Capture.NO_CAPTURE};
         //check move ends on valid row
         if (endPosition.getRow() > board.CHESSBOARDROWS || endPosition.getRow() < 1) {
-            results[0] = "invalid target";
+            results[0] = TargetSquare.INVALID_TARGET;
             return results;
         }
         //check move ends on valid col
         if (endPosition.getColumn() > board.CHESSBOARDCOLS || endPosition.getColumn() < 1) {
-            results[0] = "invalid target";
+            results[0] = TargetSquare.INVALID_TARGET;
             return results;
         }
 
@@ -29,10 +33,10 @@ public abstract class ChessMovesCalculator {
         if (board.getPiece(endPosition) != null) {//square is occupied
             // check if occupying piece is friendly
             if (board.getPiece(myPosition).getTeamColor() == board.getPiece(endPosition).getTeamColor()) { // we share a color
-                results[0] = "invalid target";
+                results[0] = TargetSquare.INVALID_TARGET;
                 return results;
             } else {
-                results[1] = "capture";
+                results[1] = Capture.CAPTURE;
                 return results;
             }
         }
@@ -60,7 +64,7 @@ public abstract class ChessMovesCalculator {
                 ChessPosition positionToValidate = new ChessPosition(row, col);
                 String[] results = IsValidMove(board, myPosition, positionToValidate);
 
-                if (Objects.equals(results[1], "capture")) {
+                if (Objects.equals(results[1], Capture.CAPTURE)) {
                     possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
                     break;
                 }
