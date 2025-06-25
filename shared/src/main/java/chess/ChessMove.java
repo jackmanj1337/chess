@@ -65,12 +65,10 @@ public class ChessMove {
         if (!(comparisonTarget instanceof ChessMove)) {
             return false;
         }
-        if (((ChessMove) comparisonTarget).getStartPosition().equals(this.getStartPosition()) &&
-                ((ChessMove) comparisonTarget).getEndPosition().equals(this.getEndPosition()) &&
-                ((ChessMove) comparisonTarget).getPromotionPiece().equals(this.getPromotionPiece())) {
-            return true;
-        }
-        return false;
+        ChessMove other = (ChessMove) comparisonTarget;
+        return (Objects.equals(this.startPosition, other.startPosition) &&
+                Objects.equals(this.endPosition, other.endPosition) &&
+                Objects.equals(this.promotionPiece, other.promotionPiece));
     }
 
     @Override
