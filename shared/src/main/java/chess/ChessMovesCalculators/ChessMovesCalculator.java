@@ -40,7 +40,7 @@ public abstract class ChessMovesCalculator {
         return results;
     }
 
-    // TODO some bug in here when going down and right
+
     protected Collection<ChessMove> validateDiagonals(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> possibleDiagonals = new ArrayList<>();
         int[][] directions = {
@@ -74,6 +74,41 @@ public abstract class ChessMovesCalculator {
 
 
         return possibleDiagonals;
+    }
+
+    protected Collection<ChessMove> validateStraights(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> possibleStraights = new ArrayList<>();
+        int[][] directions = {
+                {1, 0},  // up
+                {-1, 0},  // down
+                {0, -1}, // left
+                {0, 1}  // right
+        };
+
+        for (int[] direction : directions) {
+            int row = myPosition.getRow();
+            int col = myPosition.getColumn();
+            while (true) {
+                row += direction[0];
+                col += direction[1];
+
+                ChessPosition positionToValidate = new ChessPosition(row, col);
+                String[] results = IsValidMove(board, myPosition, positionToValidate);
+
+                if (Objects.equals(results[1], "capture")) {
+                    possibleStraights.add(new ChessMove(myPosition, positionToValidate));
+                    break;
+                }
+                if (Objects.equals(results[0], "invalid target")) {
+                    break;
+                }
+
+                possibleStraights.add(new ChessMove(myPosition, positionToValidate));
+            }
+        }
+
+
+        return possibleStraights;
     }
 
 
