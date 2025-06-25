@@ -45,14 +45,11 @@ public class ChessPosition {
         if (comparisonTarget == this) {
             return true;
         }
-        if (!(comparisonTarget instanceof ChessMove)) {
+        if (!(comparisonTarget instanceof ChessPosition)) {
             return false;
         }
-        if (((ChessPosition) comparisonTarget).getRow() == this.getRow() &&
-                ((ChessPosition) comparisonTarget).getColumn() == this.getColumn()) {
-            return true;
-        }
-        return false;
+        return ((ChessPosition) comparisonTarget).getRow() == this.getRow() &&
+                ((ChessPosition) comparisonTarget).getColumn() == this.getColumn();
     }
 
     @Override
