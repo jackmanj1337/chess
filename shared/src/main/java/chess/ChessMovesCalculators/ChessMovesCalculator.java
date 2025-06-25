@@ -13,10 +13,12 @@ public abstract class ChessMovesCalculator {
 
     protected enum Capture {CAPTURE, NO_CAPTURE}
 
+    protected enum Promotion {PROMOTION, NO_PROMOTION}
+
     public abstract Collection<ChessMove> getPossibleMoves(ChessBoard board, ChessPosition myPosition);
 
     protected Object[] IsValidMove(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
-        Object[] results = {TargetSquare.VALID_TARGET, Capture.NO_CAPTURE};
+        Object[] results = {TargetSquare.VALID_TARGET, Capture.NO_CAPTURE, Promotion.NO_PROMOTION};
         //check move ends on valid row
         if (endPosition.getRow() > board.CHESSBOARDROWS || endPosition.getRow() < 1) {
             results[0] = TargetSquare.INVALID_TARGET;
@@ -34,11 +36,13 @@ public abstract class ChessMovesCalculator {
             // check if occupying piece is friendly
             if (board.getPiece(myPosition).getTeamColor() == board.getPiece(endPosition).getTeamColor()) { // we share a color
                 results[0] = TargetSquare.INVALID_TARGET;
-                return results;
             } else {
                 results[1] = Capture.CAPTURE;
-                return results;
             }
+        }
+
+        if (endPosition.getRow() == 1 || endPosition.getRow() == 8) {
+            results[2] = Promotion.PROMOTION;
         }
 
         return results;

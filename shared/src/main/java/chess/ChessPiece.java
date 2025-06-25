@@ -101,30 +101,4 @@ public class ChessPiece {
     }
 }
 
-/*
-    @Override
-    public boolean equals(Object comparisonTarget) {
-        if (comparisonTarget == this) {
-            return true;
-        }
-        if (!(comparisonTarget instanceof ChessPiece)) {
-            return false;
-        }
-        return ((ChessPiece) comparisonTarget).getTeamColor() == this.getTeamColor() &&
-                ((ChessPiece) comparisonTarget).getPieceType() == this.getPieceType();
-    }
 
-    @Override
-    public String toString() {
-        return "ChessPiece{" +
-                "pieceColor=" + pieceColor +
-                ", type=" + type +
-                '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pieceColor, type);
-    }
-}
- */
