@@ -62,13 +62,13 @@ public abstract class ChessMovesCalculator {
                 col += direction[1];
 
                 ChessPosition positionToValidate = new ChessPosition(row, col);
-                String[] results = IsValidMove(board, myPosition, positionToValidate);
+                Object[] results = IsValidMove(board, myPosition, positionToValidate);
 
                 if (Objects.equals(results[1], Capture.CAPTURE)) {
                     possibleDiagonals.add(new ChessMove(myPosition, positionToValidate));
                     break;
                 }
-                if (Objects.equals(results[0], "invalid target")) {
+                if (Objects.equals(results[0], TargetSquare.INVALID_TARGET)) {
                     break;
                 }
 
@@ -97,13 +97,13 @@ public abstract class ChessMovesCalculator {
                 col += direction[1];
 
                 ChessPosition positionToValidate = new ChessPosition(row, col);
-                String[] results = IsValidMove(board, myPosition, positionToValidate);
+                Object[] results = IsValidMove(board, myPosition, positionToValidate);
 
-                if (Objects.equals(results[1], "capture")) {
+                if (Objects.equals(results[1], Capture.CAPTURE)) {
                     possibleStraights.add(new ChessMove(myPosition, positionToValidate));
                     break;
                 }
-                if (Objects.equals(results[0], "invalid target")) {
+                if (Objects.equals(results[0], TargetSquare.INVALID_TARGET)) {
                     break;
                 }
 

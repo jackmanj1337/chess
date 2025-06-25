@@ -18,13 +18,11 @@ public class PawnMovesCalculator extends ChessMovesCalculator {
         int targetRow = myPosition.getRow() + 1;
         int targetCol = myPosition.getColumn();
         ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
-        String[] results = IsValidMove(board, myPosition, targetPosition);
-        if (Objects.equals(results[0], "valid target") &&
-                Objects.equals(results[1], "no capture") {
+        Object[] results = IsValidMove(board, myPosition, targetPosition);
+        if (Objects.equals(results[0], TargetSquare.VALID_TARGET) &&
+                Objects.equals(results[1], Capture.NO_CAPTURE)) {
             possibleMoves.add(new ChessMove(myPosition, targetPosition));
         }
-
-
 
 
         return possibleMoves;

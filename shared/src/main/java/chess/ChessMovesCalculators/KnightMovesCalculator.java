@@ -28,7 +28,7 @@ public class KnightMovesCalculator extends ChessMovesCalculator {
             int targetRow = myPosition.getRow() + direction[0];
             int targetCol = myPosition.getColumn() + direction[1];
             ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
-            if (Objects.equals(IsValidMove(board, myPosition, targetPosition)[0], "valid target")) {
+            if (Objects.equals(IsValidMove(board, myPosition, targetPosition)[0], TargetSquare.VALID_TARGET)) {
                 possibleMoves.add(new ChessMove(myPosition, targetPosition));
             }
 
