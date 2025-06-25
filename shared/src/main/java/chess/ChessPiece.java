@@ -4,6 +4,7 @@ import chess.ChessMovesCalculators.*;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -66,5 +67,25 @@ public class ChessPiece {
         };
 
         return calculator.getPossibleMoves(board, myPosition);
+    }
+
+    @Override
+    public boolean equals(Object comparisonTarget) {
+        if (comparisonTarget == this) {
+            return true;
+        }
+        if (!(comparisonTarget instanceof ChessMove)) {
+            return false;
+        }
+        if (((ChessPiece) comparisonTarget).getTeamColor() == this.getTeamColor() &&
+                ((ChessPiece) comparisonTarget).getPieceType() == this.getPieceType()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
