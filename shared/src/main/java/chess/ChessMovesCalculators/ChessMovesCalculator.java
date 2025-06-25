@@ -11,7 +11,7 @@ import java.util.Objects;
 public abstract class ChessMovesCalculator {
     public abstract Collection<ChessMove> getPossibleMoves(ChessBoard board, ChessPosition myPosition);
 
-    private String[] IsValidMove(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
+    protected String[] IsValidMove(ChessBoard board, ChessPosition myPosition, ChessPosition endPosition) {
         String[] results = {"valid target", "no capture"};
         //check move ends on valid row
         if (endPosition.getRow() > board.CHESSBOARDROWS || endPosition.getRow() < 1) {
