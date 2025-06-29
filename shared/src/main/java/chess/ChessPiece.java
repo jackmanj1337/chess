@@ -1,9 +1,8 @@
 package chess;
 
-import chess.ChessMovesCalculators.*;
+import chess.MoveCalculator.*;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -16,19 +15,10 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
-    private int distanceMoved = 0;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-    }
-
-    public int getDistanceMoved() {
-        return distanceMoved;
-    }
-
-    public void setDistanceMoved(int distanceMoved) {
-        this.distanceMoved = distanceMoved;
     }
 
     /**
@@ -65,40 +55,42 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-
-        ChessMovesCalculator calculator = switch (getPieceType()) {
-            case KING -> new KingMovesCalculator();
-            case QUEEN -> new QueenMovesCalculator();
-            case BISHOP -> new BishopMovesCalculator();
-            case ROOK -> new RookMovesCalculator();
-            case KNIGHT -> new KnightMovesCalculator();
-            case PAWN -> new PawnMovesCalculator();
+        MoveCalculator calc = switch (board.getPiece(myPosition).getPieceType()){
+            case KING -> new KingCalculator();
+            case QUEEN -> new QueenCalculator();
+            case BISHOP -> new BishopCalculator();
+            case KNIGHT -> new KnightCalculator();
+            case ROOK -> new RookCalculator();
+            case PAWN -> new PawnCalculator();
         };
 
-        return calculator.getPossibleMoves(board, myPosition);
+        return calc.calculate(board, myPosition);
     }
+
+    @Override
+    public String toString() {
+        return switch (getPieceType()) {
+            case PieceType.KING -> (pieceColor == ChessGame.TeamColor.WHITE) ? "K" : "k";
+            case PieceType.QUEEN -> (pieceColor == ChessGame.TeamColor.WHITE) ? "Q" : "q";
+            case PieceType.BISHOP -> (pieceColor == ChessGame.TeamColor.WHITE) ? "B" : "b";
+            case PieceType.KNIGHT -> (pieceColor == ChessGame.TeamColor.WHITE) ? "N" : "n";
+            case PieceType.ROOK -> (pieceColor == ChessGame.TeamColor.WHITE) ? "R" : "r";
+            case PieceType.PAWN -> (pieceColor == ChessGame.TeamColor.WHITE) ? "P" : "p";
+        };
+    }
+
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ChessPiece that)) {
             return false;
         }
-        return getDistanceMoved() == that.getDistanceMoved() && pieceColor == that.pieceColor && type == that.type;
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pieceColor, type, getDistanceMoved());
-    }
-
-    @Override
-    public String toString() {
-        return "ChessPiece{" +
-                "pieceColor=" + pieceColor +
-                ", type=" + type +
-                ", distanceMoved=" + distanceMoved +
-                '}';
+        return Objects.hash(pieceColor, type);
     }
 }
-
 

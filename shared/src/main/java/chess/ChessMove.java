@@ -21,13 +21,6 @@ public class ChessMove {
         this.promotionPiece = promotionPiece;
     }
 
-    //my constructor
-    public ChessMove(ChessPosition startPosition, ChessPosition endPosition) {
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
-        this.promotionPiece = null;
-    }
-
     /**
      * @return ChessPosition of starting location
      */
@@ -53,27 +46,21 @@ public class ChessMove {
     }
 
     @Override
-    public String toString() {
-        return "\n" + getStartPosition() + " -> " + getEndPosition();
-    }
-
-    @Override
-    public boolean equals(Object comparisonTarget) {
-        if (comparisonTarget == this) {
-            return true;
-        }
-        if (!(comparisonTarget instanceof ChessMove)) {
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessMove chessMove)) {
             return false;
         }
-        ChessMove other = (ChessMove) comparisonTarget;
-        return (Objects.equals(this.startPosition, other.startPosition) &&
-                Objects.equals(this.endPosition, other.endPosition) &&
-                Objects.equals(this.promotionPiece, other.promotionPiece));
+        return Objects.equals(getStartPosition(), chessMove.getStartPosition()) && Objects.equals(getEndPosition(), chessMove.getEndPosition()) && getPromotionPiece() == chessMove.getPromotionPiece();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startPosition, endPosition, promotionPiece);
+        return Objects.hash(getStartPosition(), getEndPosition(), getPromotionPiece());
     }
 
+    @Override
+    public String toString() {
+        return startPosition + "->" + endPosition + " {" + promotionPiece +
+                '}';
+    }
 }
