@@ -1,6 +1,6 @@
 package chess.BoardPrinter;
 
-import JacobsUtil.StringFormatingConstants;
+import jacobsutil.StringFormatingConstants;
 
 public class Constants {
     public static final String AVAILABLE_MOVE = StringFormatingConstants.BG_GREEN;

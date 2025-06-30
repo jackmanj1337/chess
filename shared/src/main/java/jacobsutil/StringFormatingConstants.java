@@ -1,4 +1,4 @@
-package JacobsUtil;
+package jacobsutil;
 
 public class StringFormatingConstants {
     // Reset
