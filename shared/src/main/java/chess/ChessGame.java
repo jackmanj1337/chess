@@ -1,11 +1,6 @@
 package chess;
 
-import chess.MoveCalculator.MoveCalculator;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -47,7 +42,7 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         activeTeam = team;
-        validMoveCount = getAllValidMoves();
+        validMoveCount = calculateAllValidMoves();
     }
 
     /**
@@ -71,7 +66,7 @@ public class ChessGame {
         return new ChessPosition(0, 0); // no king of the appropriate color found;
     }
 
-    public boolean IsPositionThreatened(ChessPosition position) {
+    public boolean isPositionThreatened(ChessPosition position) {
         boolean positionIsthreatened = false;
         TeamColor threateningColor;
         if (board.getPiece(position).getTeamColor() == TeamColor.WHITE) {
@@ -93,18 +88,20 @@ public class ChessGame {
         };
 
         for (int[] direction : knightDirections) {
-            int tartgetRow = position.getRow();
+            int targetRow = position.getRow();
             int targetCol = position.getColumn();
 
-            tartgetRow += direction[0];
+            targetRow += direction[0];
             targetCol += direction[1];
-            ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
-            ChessPiece threateningPiece = board.getPiece(threateningPosition);
-            if (threateningPiece != null) {
-                if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                        Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
-                    positionIsthreatened = true;
-                    return positionIsthreatened;
+            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
+                ChessPiece threateningPiece = board.getPiece(threateningPosition);
+                if (threateningPiece != null) {
+                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
+                        positionIsthreatened = true;
+                        return positionIsthreatened;
+                    }
                 }
             }
 
@@ -119,18 +116,20 @@ public class ChessGame {
         };
 
         for (int[] direction : pawnDirections) {
-            int tartgetRow = position.getRow();
+            int targetRow = position.getRow();
             int targetCol = position.getColumn();
 
-            tartgetRow += direction[0] * directionModifier;
+            targetRow += direction[0] * directionModifier;
             targetCol += direction[1];
-            ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
-            ChessPiece threateningPiece = board.getPiece(threateningPosition);
-            if (threateningPiece != null) {
-                if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                        Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.PAWN)) {
-                    positionIsthreatened = true;
-                    return positionIsthreatened;
+            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
+                ChessPiece threateningPiece = board.getPiece(threateningPosition);
+                if (threateningPiece != null) {
+                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.PAWN)) {
+                        positionIsthreatened = true;
+                        return positionIsthreatened;
+                    }
                 }
             }
 
@@ -150,18 +149,20 @@ public class ChessGame {
         };
 
         for (int[] direction : kingDirections) {
-            int tartgetRow = position.getRow();
+            int targetRow = position.getRow();
             int targetCol = position.getColumn();
 
-            tartgetRow += direction[0];
+            targetRow += direction[0];
             targetCol += direction[1];
-            ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
-            ChessPiece threateningPiece = board.getPiece(threateningPosition);
-            if (threateningPiece != null) {
-                if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                        Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KING)) {
-                    positionIsthreatened = true;
-                    return positionIsthreatened;
+            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
+                ChessPiece threateningPiece = board.getPiece(threateningPosition);
+                if (threateningPiece != null) {
+                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KING)) {
+                        positionIsthreatened = true;
+                        return positionIsthreatened;
+                    }
                 }
             }
 
@@ -176,15 +177,15 @@ public class ChessGame {
         };
 
         for (int[] direction : straights) {
-            int tartgetRow = position.getRow();
+            int targetRow = position.getRow();
             int targetCol = position.getColumn();
-            while (true) {
-                tartgetRow += direction[0];
+            while (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                targetRow += direction[0];
                 targetCol += direction[1];
-                ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
-                ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (threateningPiece != null) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), null)) {
+                if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                    ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
+                    ChessPiece threateningPiece = board.getPiece(threateningPosition);
+                    if (threateningPiece != null) {
                         if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
                             if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.ROOK) ||
                                     Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
@@ -212,15 +213,15 @@ public class ChessGame {
         };
 
         for (int[] direction : diagonals) {
-            int tartgetRow = position.getRow();
+            int targetRow = position.getRow();
             int targetCol = position.getColumn();
-            while (true) {
-                tartgetRow += direction[0];
+            while (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                targetRow += direction[0];
                 targetCol += direction[1];
-                ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
-                ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (threateningPiece != null) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), null)) {
+                if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                    ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
+                    ChessPiece threateningPiece = board.getPiece(threateningPosition);
+                    if (threateningPiece != null) {
                         if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
                             if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.BISHOP) ||
                                     Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
@@ -232,6 +233,7 @@ public class ChessGame {
                         } else {
                             break;
                         }
+
                     }
                 }
 
@@ -268,11 +270,13 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ArrayList<ChessMove> moves = (ArrayList<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
-        for (ChessMove move : moves) {
+        Iterator<ChessMove> iter = moves.iterator();
+        while (iter.hasNext()) {
+            ChessMove move = iter.next();
             ChessBoard testingGrounds = new ChessBoard(board);
             makeTestMove(testingGrounds, move);
             if (isInCheck(getTeamTurn())) {
-                moves.remove(move);
+                iter.remove();
             }
         }
 
@@ -280,7 +284,7 @@ public class ChessGame {
         return moves;
     }
 
-    private int getAllValidMoves() {
+    private int calculateAllValidMoves() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 allValidMoves[i][j].clear();
@@ -290,7 +294,8 @@ public class ChessGame {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPosition position = new ChessPosition(i + 1, j + 1);
-                if (Objects.equals(board.getPiece(position).getTeamColor(), getTeamTurn())) {
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == getTeamTurn()) {
                     allValidMoves[i][j].addAll(validMoves(position));
                     count += allValidMoves[i][j].size();
                 }
@@ -343,7 +348,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return IsPositionThreatened(findKing(teamColor));
+        return isPositionThreatened(findKing(teamColor));
     }
 
     /**
@@ -378,6 +383,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        this.board = new ChessBoard();
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 this.board.addPiece(new ChessPosition(i, j), board.getPiece(new ChessPosition(i, j)));
@@ -399,11 +405,11 @@ public class ChessGame {
         if (!(o instanceof ChessGame chessGame)) {
             return false;
         }
-        return validMoveCount == chessGame.validMoveCount && activeTeam == chessGame.activeTeam && Objects.equals(getBoard(), chessGame.getBoard()) && Objects.deepEquals(getAllValidMoves(), chessGame.getAllValidMoves());
+        return validMoveCount == chessGame.validMoveCount && activeTeam == chessGame.activeTeam && Objects.equals(getBoard(), chessGame.getBoard()) && Objects.deepEquals(allValidMoves, chessGame.allValidMoves);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(activeTeam, getBoard(), validMoveCount);
+        return Objects.hash(activeTeam, getBoard(), Arrays.deepHashCode(allValidMoves), validMoveCount);
     }
 }
