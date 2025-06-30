@@ -3,6 +3,7 @@ package chess;
 import chess.MoveCalculator.MoveCalculator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -13,16 +14,23 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private TeamColor activeTeam = TeamColor.WHITE;
+    private TeamColor activeTeam;
     private ChessBoard board;
 
 
     @SuppressWarnings("unchecked")
     private ArrayList<ChessMove>[][] allValidMoves = new ArrayList[8][8];
+    private int validMoveCount;
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                allValidMoves[i][j] = new ArrayList<>();
+            }
+        }
+        setTeamTurn(TeamColor.WHITE);
     }
 
     /**
@@ -39,6 +47,7 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         activeTeam = team;
+        validMoveCount = getAllValidMoves();
     }
 
     /**
@@ -91,10 +100,12 @@ public class ChessGame {
             targetCol += direction[1];
             ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
             ChessPiece threateningPiece = board.getPiece(threateningPosition);
-            if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
-                positionIsthreatened = true;
-                return positionIsthreatened;
+            if (threateningPiece != null) {
+                if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                        Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
+                    positionIsthreatened = true;
+                    return positionIsthreatened;
+                }
             }
 
 
@@ -115,10 +126,12 @@ public class ChessGame {
             targetCol += direction[1];
             ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
             ChessPiece threateningPiece = board.getPiece(threateningPosition);
-            if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.PAWN)) {
-                positionIsthreatened = true;
-                return positionIsthreatened;
+            if (threateningPiece != null) {
+                if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                        Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.PAWN)) {
+                    positionIsthreatened = true;
+                    return positionIsthreatened;
+                }
             }
 
 
@@ -144,11 +157,14 @@ public class ChessGame {
             targetCol += direction[1];
             ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
             ChessPiece threateningPiece = board.getPiece(threateningPosition);
-            if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KING)) {
-                positionIsthreatened = true;
-                return positionIsthreatened;
+            if (threateningPiece != null) {
+                if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                        Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KING)) {
+                    positionIsthreatened = true;
+                    return positionIsthreatened;
+                }
             }
+
         }
 
         // check straights for rooks and queens
@@ -167,19 +183,22 @@ public class ChessGame {
                 targetCol += direction[1];
                 ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
                 ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (Objects.equals(threateningPiece.getTeamColor(), null)) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
-                        if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.ROOK) ||
-                                Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
-                            positionIsthreatened = true;
-                            return positionIsthreatened;
+                if (threateningPiece != null) {
+                    if (Objects.equals(threateningPiece.getTeamColor(), null)) {
+                        if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
+                            if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.ROOK) ||
+                                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
+                                positionIsthreatened = true;
+                                return positionIsthreatened;
+                            } else {
+                                break;
+                            }
                         } else {
                             break;
                         }
-                    } else {
-                        break;
                     }
                 }
+
 
             }
         }
@@ -200,25 +219,44 @@ public class ChessGame {
                 targetCol += direction[1];
                 ChessPosition threateningPosition = new ChessPosition(tartgetRow, targetCol);
                 ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (Objects.equals(threateningPiece.getTeamColor(), null)) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
-                        if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.BISHOP) ||
-                                Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
-                            positionIsthreatened = true;
-                            return positionIsthreatened;
+                if (threateningPiece != null) {
+                    if (Objects.equals(threateningPiece.getTeamColor(), null)) {
+                        if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
+                            if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.BISHOP) ||
+                                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
+                                positionIsthreatened = true;
+                                return positionIsthreatened;
+                            } else {
+                                break;
+                            }
                         } else {
                             break;
                         }
-                    } else {
-                        break;
                     }
                 }
+
 
             }
         }
 
 
         return positionIsthreatened;
+    }
+
+
+    private void makeTestMove(ChessBoard testingBoard, ChessMove move) {
+        int startRow = move.getStartPosition().getRow() - 1;
+        int startCol = move.getStartPosition().getColumn() - 1;
+        TeamColor activeColor = testingBoard.getPiece(move.getStartPosition()).getTeamColor();
+        ChessPiece.PieceType pieceToAdd;
+        if (move.getPromotionPiece() == null) {
+            pieceToAdd = testingBoard.getPiece(move.getStartPosition()).getPieceType();
+        } else {
+            pieceToAdd = move.getPromotionPiece();
+        }
+        testingBoard.addPiece(move.getEndPosition(), new ChessPiece(activeColor, pieceToAdd));
+
+        testingBoard.removePiece(move.getStartPosition());
     }
 
     /**
@@ -229,9 +267,38 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ArrayList<ChessMove> moves;
-        return null;
+        ArrayList<ChessMove> moves = (ArrayList<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
+        for (ChessMove move : moves) {
+            ChessBoard testingGrounds = new ChessBoard(board);
+            makeTestMove(testingGrounds, move);
+            if (isInCheck(getTeamTurn())) {
+                moves.remove(move);
+            }
+        }
+
+
+        return moves;
     }
+
+    private int getAllValidMoves() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                allValidMoves[i][j].clear();
+            }
+        }
+        int count = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition position = new ChessPosition(i + 1, j + 1);
+                if (Objects.equals(board.getPiece(position).getTeamColor(), getTeamTurn())) {
+                    allValidMoves[i][j].addAll(validMoves(position));
+                    count += allValidMoves[i][j].size();
+                }
+            }
+        }
+        return count;
+    }
+
 
     /**
      * Makes a move in a chess game
@@ -276,7 +343,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return IsPositionThreatened(findKing(teamColor));
     }
 
     /**
@@ -291,7 +358,7 @@ public class ChessGame {
     2. something much more complicated where you check all vectors of attack and
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return (isInCheck(teamColor) && (validMoveCount == 0));
     }
 
     /**
@@ -302,7 +369,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return (!isInCheck(teamColor) && (validMoveCount == 0));
     }
 
     /**
@@ -325,5 +392,18 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessGame chessGame)) {
+            return false;
+        }
+        return validMoveCount == chessGame.validMoveCount && activeTeam == chessGame.activeTeam && Objects.equals(getBoard(), chessGame.getBoard()) && Objects.deepEquals(getAllValidMoves(), chessGame.getAllValidMoves());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(activeTeam, getBoard(), validMoveCount);
     }
 }

@@ -21,6 +21,11 @@ public class ChessPiece {
         this.type = type;
     }
 
+    public ChessPiece(ChessPiece other) {
+        this.pieceColor = other.getTeamColor();
+        this.type = other.getPieceType();
+    }
+
     /**
      * The various different chess piece options
      */
@@ -55,7 +60,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        MoveCalculator calc = switch (board.getPiece(myPosition).getPieceType()){
+        MoveCalculator calc = switch (board.getPiece(myPosition).getPieceType()) {
             case KING -> new KingCalculator();
             case QUEEN -> new QueenCalculator();
             case BISHOP -> new BishopCalculator();

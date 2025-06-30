@@ -16,13 +16,19 @@ public class ChessBoard {
 
     }
 
-    public ChessBoard(ChessBoard copyTarget) {
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                addPiece(new ChessPosition(i, j), copyTarget.getPiece(new ChessPosition(i, j)));
+    public ChessBoard(ChessBoard other) {
+        this.board = new ChessPiece[8][8];
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = other.board[row][col];
+                if (piece != null) {
+                    this.board[row][col] = new ChessPiece(piece);
+                }
             }
         }
     }
+
 
     /**
      * Adds a chess piece to the chessboard
@@ -46,7 +52,14 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow() - 1][position.getColumn() - 1];
+        int targetRow = position.getRow() - 1;
+        int targetCol = position.getColumn() - 1;
+
+        if (targetRow > 7 || targetRow < 0 || targetCol > 7 || targetCol < 0) {
+            return null;
+        } else {
+            return board[targetRow][targetCol];
+        }
     }
 
     /**
