@@ -42,7 +42,7 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         activeTeam = team;
-        validMoveCount = calculateAllValidMoves();
+        validMoveCount = calculateAllValidMoves(team);
     }
 
     /**
@@ -66,10 +66,10 @@ public class ChessGame {
         return new ChessPosition(0, 0); // no king of the appropriate color found;
     }
 
-    public boolean isPositionThreatened(ChessPosition position) {
+    public boolean isPositionThreatened(ChessBoard board, ChessPosition position) {
         boolean positionIsthreatened = false;
         TeamColor threateningColor;
-        if (board.getPiece(position).getTeamColor() == TeamColor.WHITE) {
+        if (getTeamTurn() == TeamColor.WHITE) {
             threateningColor = TeamColor.BLACK;
         } else {
             threateningColor = TeamColor.WHITE;
@@ -275,7 +275,8 @@ public class ChessGame {
             ChessMove move = iter.next();
             ChessBoard testingGrounds = new ChessBoard(board);
             makeTestMove(testingGrounds, move);
-            if (isInCheck(getTeamTurn())) {
+            ChessPosition activeKing = findKing(getTeamTurn());
+            if (isPositionThreatened(testingGrounds, activeKing)) {
                 iter.remove();
             }
         }
@@ -284,7 +285,7 @@ public class ChessGame {
         return moves;
     }
 
-    private int calculateAllValidMoves() {
+    private int calculateAllValidMoves(TeamColor team) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 allValidMoves[i][j].clear();
@@ -295,7 +296,7 @@ public class ChessGame {
             for (int j = 0; j < 8; j++) {
                 ChessPosition position = new ChessPosition(i + 1, j + 1);
                 ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == getTeamTurn()) {
+                if (piece != null && piece.getTeamColor() == team) {
                     allValidMoves[i][j].addAll(validMoves(position));
                     count += allValidMoves[i][j].size();
                 }
@@ -339,6 +340,14 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), new ChessPiece(activeColor, pieceToAdd));
 
         board.removePiece(move.getStartPosition());
+
+        TeamColor nextPlayer;
+        if (getTeamTurn() == TeamColor.WHITE) {
+            nextPlayer = TeamColor.BLACK;
+        } else {
+            nextPlayer = TeamColor.WHITE;
+        }
+        setTeamTurn(nextPlayer);
     }
 
     /**
@@ -348,7 +357,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return isPositionThreatened(findKing(teamColor));
+        return isPositionThreatened(board, findKing(teamColor));
     }
 
     /**
@@ -363,7 +372,7 @@ public class ChessGame {
     2. something much more complicated where you check all vectors of attack and
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return (isInCheck(teamColor) && (validMoveCount == 0));
+        return (isInCheck(teamColor) && (calculateAllValidMoves(teamColor) == 0));
     }
 
     /**
@@ -374,7 +383,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return (!isInCheck(teamColor) && (validMoveCount == 0));
+        return (!isInCheck(teamColor) && (calculateAllValidMoves(teamColor) == 0));
     }
 
     /**

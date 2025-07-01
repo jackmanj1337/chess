@@ -54,12 +54,8 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         int targetRow = position.getRow() - 1;
         int targetCol = position.getColumn() - 1;
-
-        if (targetRow > 7 || targetRow < 0 || targetCol > 7 || targetCol < 0) {
-            return null;
-        } else {
-            return board[targetRow][targetCol];
-        }
+        return board[targetRow][targetCol];
+        
     }
 
     /**
