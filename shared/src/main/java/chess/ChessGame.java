@@ -268,7 +268,7 @@ public class ChessGame {
     private Collection<ChessMove> checkCastle(ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        if (Objects.equals(position, new ChessPosition(1, 5))) {
+        if (Objects.equals(position, new ChessPosition(1, 5)) && !isInCheck(TeamColor.WHITE)) {
             if (whiteCanKingSideCastle &&
                     board.getPiece(new ChessPosition(1, 6)) == null &&
                     board.getPiece(new ChessPosition(1, 7)) == null) {
@@ -299,7 +299,7 @@ public class ChessGame {
                 }
             }
         }
-        if (Objects.equals(position, new ChessPosition(8, 5))) {
+        if (Objects.equals(position, new ChessPosition(8, 5)) && !isInCheck(TeamColor.BLACK)) {
             if (blackCanKingSideCastle &&
                     board.getPiece(new ChessPosition(8, 6)) == null &&
                     board.getPiece(new ChessPosition(8, 7)) == null) {
@@ -409,8 +409,8 @@ public class ChessGame {
 
         ChessMove whiteQueenSideCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null);
         ChessMove whiteKingSideCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null);
-        ChessMove blackQueenSideCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(8, 3), null);
-        ChessMove blackKingSideCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(8, 7), null);
+        ChessMove blackQueenSideCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null);
+        ChessMove blackKingSideCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null);
 
         if (Objects.equals(move, whiteQueenSideCastle)) {
             board.removePiece(move.getStartPosition());
