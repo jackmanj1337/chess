@@ -55,7 +55,7 @@ public class ChessBoard {
         int targetRow = position.getRow() - 1;
         int targetCol = position.getColumn() - 1;
         return board[targetRow][targetCol];
-        
+
     }
 
     /**
@@ -111,8 +111,15 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        StringBuilder output = new StringBuilder();
+        for (int i = 7; i >= 0; i--) {
+            output.append("|");
+            for (int j = 0; j < 8; j++) {
+                output.append(board[i][j] != null ? board[i][j].toString() : " ");
+                output.append("|");
+            }
+            output.append("\n");
+        }
+        return output.toString();
     }
 }
