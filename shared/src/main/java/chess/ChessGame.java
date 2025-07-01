@@ -42,7 +42,7 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         activeTeam = team;
-        validMoveCount = calculateAllValidMoves(team);
+        //validMoveCount = calculateAllValidMoves(team);
     }
 
     /**
@@ -69,7 +69,7 @@ public class ChessGame {
     public boolean isPositionThreatened(ChessBoard board, ChessPosition position) {
         boolean positionIsthreatened = false;
         TeamColor threateningColor;
-        if (getTeamTurn() == TeamColor.WHITE) {
+        if (board.getPiece(position).getTeamColor() == TeamColor.WHITE) {
             threateningColor = TeamColor.BLACK;
         } else {
             threateningColor = TeamColor.WHITE;
@@ -269,13 +269,14 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        TeamColor defending = board.getPiece(startPosition).getTeamColor();
         Collection<ChessMove> moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
         Iterator<ChessMove> iter = moves.iterator();
         while (iter.hasNext()) {
             ChessMove move = iter.next();
             ChessBoard testingGrounds = new ChessBoard(board);
             makeTestMove(testingGrounds, move);
-            ChessPosition activeKing = findKing(getTeamTurn(), testingGrounds);
+            ChessPosition activeKing = findKing(defending, testingGrounds);
             if (isPositionThreatened(testingGrounds, activeKing)) {
                 iter.remove();
             }
