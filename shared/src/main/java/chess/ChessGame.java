@@ -53,7 +53,7 @@ public class ChessGame {
         BLACK
     }
 
-    public ChessPosition findKing(TeamColor color) {
+    public ChessPosition findKing(TeamColor color, ChessBoard board) {
         ChessPiece king = new ChessPiece(color, ChessPiece.PieceType.KING);
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
@@ -269,13 +269,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ArrayList<ChessMove> moves = (ArrayList<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
+        Collection<ChessMove> moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
         Iterator<ChessMove> iter = moves.iterator();
         while (iter.hasNext()) {
             ChessMove move = iter.next();
             ChessBoard testingGrounds = new ChessBoard(board);
             makeTestMove(testingGrounds, move);
-            ChessPosition activeKing = findKing(getTeamTurn());
+            ChessPosition activeKing = findKing(getTeamTurn(), testingGrounds);
             if (isPositionThreatened(testingGrounds, activeKing)) {
                 iter.remove();
             }
@@ -357,7 +357,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return isPositionThreatened(board, findKing(teamColor));
+        return isPositionThreatened(board, findKing(teamColor, board));
     }
 
     /**
@@ -372,7 +372,9 @@ public class ChessGame {
     2. something much more complicated where you check all vectors of attack and
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return (isInCheck(teamColor) && (calculateAllValidMoves(teamColor) == 0));
+        boolean check = isInCheck(teamColor);
+        int moves = calculateAllValidMoves(teamColor);
+        return (check) && (moves == 0);
     }
 
     /**
