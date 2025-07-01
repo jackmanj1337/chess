@@ -15,7 +15,8 @@ public class ChessGame {
     private boolean whiteCanKingSideCastle = true;
     private boolean blackCanQueenSideCastle = true;
     private boolean blackCanKingSideCastle = true;
-
+    private ChessPosition enPassantablePawn = null;
+    private ChessPosition enPassantDestination = null;
 
     @SuppressWarnings("unchecked")
     private ArrayList<ChessMove>[][] allValidMoves = new ArrayList[8][8];
@@ -346,6 +347,21 @@ public class ChessGame {
         TeamColor defending = board.getPiece(startPosition).getTeamColor();
         Collection<ChessMove> moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
         moves.addAll(checkCastle(startPosition));
+
+        if (enPassantablePawn != null) {
+            if (Objects.equals(board.getPiece(startPosition).getPieceType(), ChessPiece.PieceType.PAWN) &&
+                    (startPosition.getRow() == enPassantablePawn.getRow()) &&
+                    (board.getPiece(startPosition).getTeamColor() != board.getPiece(enPassantablePawn).getTeamColor()) &&
+                    (startPosition.getColumn() + 1 == enPassantablePawn.getColumn() || startPosition.getColumn() - 1 == enPassantablePawn.getColumn())) {
+                if (board.getPiece(startPosition).getTeamColor() == TeamColor.WHITE) {
+                    moves.add(new ChessMove(startPosition, new ChessPosition(6, enPassantablePawn.getColumn()), null));
+                } else {
+                    moves.add(new ChessMove(startPosition, new ChessPosition(3, enPassantablePawn.getColumn()), null));
+                }
+            }
+        }
+
+
         Iterator<ChessMove> iter = moves.iterator();
         while (iter.hasNext()) {
             ChessMove move = iter.next();
@@ -445,6 +461,23 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), new ChessPiece(activeColor, pieceToAdd));
 
             board.removePiece(move.getStartPosition());
+        }
+
+        //Check if we did EnPassant
+        if (Objects.equals(enPassantDestination, move.getEndPosition()) && board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
+            board.removePiece(enPassantablePawn);
+        }
+
+        //check if next player can EnPassant
+        if ((move.getStartPosition().getRow() == 2) && (move.getEndPosition().getRow() == 4) && (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN)) {
+            enPassantablePawn = move.getEndPosition();
+            enPassantDestination = new ChessPosition(3, enPassantablePawn.getColumn());
+        } else if ((move.getStartPosition().getRow() == 7) && (move.getEndPosition().getRow() == 5) && (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN)) {
+            enPassantablePawn = move.getEndPosition();
+            enPassantDestination = new ChessPosition(6, enPassantablePawn.getColumn());
+        } else {
+            enPassantablePawn = null;
+            enPassantDestination = null;
         }
 
 
