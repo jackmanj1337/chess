@@ -1,0 +1,89 @@
+actor Client
+participant Server
+participant Handler
+participant Service
+participant DataAccess
+database db
+
+entryspacing 0.9
+group #lightblue Registration #white
+Client -> Server: [POST] /user\n{"username":" ", "password":" ", "email":" "}
+Server -> Handler: {"username":" ", "password":" ", "email":" "}
+Handler -> Service: register(RegisterRequest)
+Service -> DataAccess: getUser(username)
+DataAccess -> db:Find UserData by username
+break User with username already exists
+DataAccess --> Service: UserData
+Service --> Server: AlreadyTakenException
+Server --> Client: 403\n{"message": "Error: username already taken"}
+end
+DataAccess --> Service: null
+Service -> DataAccess:createUser(userData)
+DataAccess -> db:Add UserData
+Service -> DataAccess:createAuth(authData)
+DataAccess -> db:Add AuthData
+Service --> Handler: RegisterResult
+Handler --> Server: {"username" : " ", "authToken" : " "}
+Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+end
+
+group #orange Login #white
+Client -> Server: [POST] /session\n{username, password}
+Server -> Handler: {"username":" ", "password":" "}
+Handler -> Service: login(LoginRequest)
+Service -> DataAccess: getUser(username)
+DataAccess -> db:Find UserData by username
+break User with username does not exist
+DataAccess --> Service: null
+Service --> Server: DoesNotExistException
+Server --> Client: 404\n{"message": "Error: No User with that username exists"}
+end
+DataAccess --> Service: user exists
+Service -> DataAccess:verifyPassword(username, password)
+DataAccess -> db:Confirm password for username
+break Incorrect Password for username
+DataAccess --> Service:false
+Service --> Server: IncorrectPasswordException
+Server --> Client: 400\n{"message": "Error: Incorrect Password"}
+end
+DataAccess --> Service:true
+Service -> DataAccess:createAuth(authData)
+DataAccess -> db:Add AuthData
+Service --> Handler: LoginResult
+Handler --> Server: {"username" : " ", "authToken" : " "}
+Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+
+end
+
+group #green Logout #white
+Client -> Server: [DELETE] /session\nauthToken
+Server -> Handler: logout{"authToken": """ "}
+Handler -> Service: logout(authToken)
+Service -> DataAccess:deleteToken(authToken)
+DataAccess -> db: Delete AuthData
+break authToken does not exist
+DataAccess --> Service:false
+Service --> Server: ImaginaryAuthTokenException
+Server --> Client: 404\n{"message": "Error: AuthToken does not exist"}
+end
+DataAccess --> Service: true
+Service --> Handler: true
+Handler --> Server: true
+Server --> Client: 200
+end
+
+group #red List Games #white
+Client -> Server: [GET] /game\nauthToken
+end
+
+group #purple Create Game #white
+Client -> Server: [POST] /game\nauthToken\n{gameName}
+end
+
+group #yellow Join Game #black
+Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
+end
+
+group #gray Clear application #white
+Client -> Server: [DELETE] /db
+end
