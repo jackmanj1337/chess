@@ -68,22 +68,76 @@ Server --> Client: 404\n{"message": "Error: AuthToken does not exist"}
 end
 DataAccess --> Service: true
 Service --> Handler: true
-Handler --> Server: true
+Handler --> Server: {}
 Server --> Client: 200
 end
 
 group #red List Games #white
 Client -> Server: [GET] /game\nauthToken
+Server -> Handler: listAllGames{"authToken": " "}
+Handler -> Service: listAllGames(authToken)
+Service -> DataAccess: listAllGames(authToken)
+DataAccess -> db: listAllGames(authToken)
+DataAccess --> Service: Collection<Gamedata>
+Service --> Handler: Collection<Gamedata>
+Handler --> Server:{ "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
+Server --> Client:[200] { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
 end
 
 group #purple Create Game #white
 Client -> Server: [POST] /game\nauthToken\n{gameName}
+Server -> Handler: createGame{"authToken": " ", "gameID": " "}
+Handler -> Service: createGame(authToken, "gameID": " ")
+Service -> DataAccess: validateAuthToken(authToken)
+DataAccess -> db: find AuthData
+DataAccess --> Service:AuthData
+Service -> DataAccess: doesGameExist(gameID)
+DataAccess -> db:find gameID
+break gameID in use 
+DataAccess --> Service:gameIDInUse
+Service --> Server: GameIDInUseException
+Server --> Client: 500\n{"message": "Error: GameID is allready in use"}
+end
+DataAccess --> Service: GameIDAvailable
+Service -> DataAccess: createGame(AuthToken, gameID)
+DataAccess -> db: create new game data
+DataAccess --> Service: gameID
+Service --> Handler: gameID
+Handler --> Server: {"gameID": " "}
+Server --> Client: {"gameID": " "}
 end
 
 group #yellow Join Game #black
 Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
+Server -> Handler: joinGame{"authToken": " ", "gameID": " ", "playerPosition": " "}
+Handler -> Service: joinGame(authToken,  "gameID": " ", "playerPosition": " ")
+Service -> DataAccess: validateAuthToken(authToken)
+DataAccess -> db: find AuthData
+DataAccess --> Service:AuthData
+Service -> DataAccess: isPositionOpen(gameID, position)
+DataAccess -> db:find gameID
+break position occupied 
+DataAccess --> Service:PositionOccupied
+Service --> Server: PositionOccupiedException
+Server --> Client: 500\n{"message": "Error: Position is occupied"}
+end
+DataAccess --> Service: PositionAvailable
+Service -> DataAccess: joinGame(AuthToken, gameID, position)
+DataAccess -> db: add player to game at position
+DataAccess --> Service: GameData
+Service --> Handler: GameData
+Handler --> Server: {"gameID": " ", "gamePosition": " "}
+Server --> Client: {"gameID": " ", "gamePosition": " "}
 end
 
 group #gray Clear application #white
 Client -> Server: [DELETE] /db
+Server -> Handler: clearAll()
+Handler -> Service: clearAll()
+Service -> DataAccess: clearAll()
+DataAccess -> db: Delete all records
+DataAccess --> Service:success
+Service --> Handler:success
+Handler --> Server:success
+Server --> Client: [200]
 end
