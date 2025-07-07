@@ -1,17 +1,15 @@
-package dataaccess.memory;
+package dataaccess;
 
-import dataaccess.DataAccessException;
 import dataaccess.dainterface.UserDAI;
 import model.UserData;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class UserDAO implements UserDAI {
 
-    ArrayList<UserData> users = new ArrayList<>();
+    static ArrayList<UserData> users = new ArrayList<>();
 
-    UserDAO() {
+    public UserDAO() {
     }
 
     ;
