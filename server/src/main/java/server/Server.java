@@ -35,6 +35,9 @@ public class Server {
 
         Spark.post("/session", UserHandler::handleLogin);
         System.out.println("Registered POST /session");
+
+        Spark.delete("/session", UserHandler::handleLogout);
+        System.out.println("Registered DELETE /session");
     }
 
 

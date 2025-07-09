@@ -45,4 +45,21 @@ public class UserHandler {
 
         return "called successfully";
     }
+
+    public static Object handleLogout(Request req, Response res) throws DataAccessException {
+        System.out.println("handleLogout called");
+        LogoutRequest logoutInfo = new LogoutRequest(req.headers("Authorization"));
+        res.type("application/json");
+
+        if (logoutInfo.authToken().isEmpty()) {
+            res.status(400);
+        } else {
+            LogoutResult result = userService.logout(logoutInfo);
+            res.status(result.httpCode());
+            return gson.toJson(result);
+        }
+
+
+        return "called successfully";
+    }
 }

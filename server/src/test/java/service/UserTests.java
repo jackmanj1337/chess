@@ -2,11 +2,16 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.requests.LoginRequest;
+import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
 import service.UserService;
+import service.results.LoginResult;
+import service.results.LogoutResult;
 import service.results.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +25,9 @@ public class UserTests {
 
         AuthDAO auths = new AuthDAO();
         auths.deleteAllAuths();
+
+        GameDAO games = new GameDAO();
+        games.deleteAllGames();
     }
 
     @Test
@@ -35,6 +43,40 @@ public class UserTests {
         userservice.registerNewUser(new RegisterRequest("doug", "securepass", "doug2@testing.com"));
         RegisterResult result = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
         assertEquals(403, result.httpCode(), "registered 2 \"doug\"s");
+    }
+
+    @Test
+    public void logoutExistingUser() throws DataAccessException {
+        UserService userservice = new UserService();
+        RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
+        LogoutResult loutResult = userservice.logout(new LogoutRequest(regResult.authToken()));
+        assertEquals(200, loutResult.httpCode(), "should have gotten a 200 response");
+    }
+
+
+    @Test
+    public void logoutImaginaryUser() throws DataAccessException {
+        UserService userservice = new UserService();
+        LogoutResult loutResult = userservice.logout(new LogoutRequest("Spoofed token"));
+        assertEquals(401, loutResult.httpCode(), "should have gotten a 401 response");
+    }
+
+    @Test
+    public void loginExistingUser() throws DataAccessException {
+        UserService userservice = new UserService();
+        RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
+        userservice.logout(new LogoutRequest(regResult.authToken()));
+        LoginResult linResult = userservice.login(new LoginRequest("doug", "pass"));
+
+        assertEquals(200, linResult.httpCode(), "should have gotten a 200 response");
+    }
+
+
+    @Test
+    public void loginImaginaryUser() throws DataAccessException {
+        UserService userservice = new UserService();
+        LoginResult linResult = userservice.login(new LoginRequest("BadHacker", "definitely a real password"));
+        assertEquals(401, linResult.httpCode(), "should have gotten a 401 response");
     }
 
 

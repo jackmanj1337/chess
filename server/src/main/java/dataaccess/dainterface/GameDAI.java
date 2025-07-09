@@ -3,6 +3,9 @@ package dataaccess.dainterface;
 import dataaccess.DataAccessException;
 import model.GameData;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public interface GameDAI {
 
     public GameData addNewGame(GameData data) throws DataAccessException;
@@ -15,5 +18,5 @@ public interface GameDAI {
 
     public void deleteAllGames() throws DataAccessException;
 
-
+    public ArrayList<GameData> listAllGames() throws DataAccessException;
 }

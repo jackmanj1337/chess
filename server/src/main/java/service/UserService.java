@@ -6,6 +6,7 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 import service.results.LoginResult;
+import service.results.LogoutResult;
 import service.results.RegisterResult;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
@@ -34,18 +35,20 @@ public class UserService {
         }
         if (loginRequest.password().equals(loginTarget.password())) {
             String token;
-            if (authAccess.getAuthFromUsername(loginRequest.username()) == null) {
-                token = UUID.randomUUID().toString();
-                authAccess.addAuth(new AuthData(token, loginRequest.username()));
-            } else {
-                token = authAccess.getAuthFromUsername(loginRequest.username()).authToken();
-            }
+            token = UUID.randomUUID().toString();
+            authAccess.addAuth(new AuthData(token, loginRequest.username()));
             return new LoginResult(200, "all good", loginRequest.username(), token);
         } else {
             return new LoginResult(401, "unauthorized", loginRequest.username(), null);
         }
     }
 
-    public void logout(LogoutRequest logoutRequest) {
+    public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
+        AuthDAO authAccess = new AuthDAO();
+        if (authAccess.getAuthFromToken(logoutRequest.authToken()) != null) {
+            authAccess.deleteAuth(logoutRequest.authToken());
+            return new LogoutResult(200, "all good");
+        }
+        return new LogoutResult(401, "unauthorized");
     }
 }

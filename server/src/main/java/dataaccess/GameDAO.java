@@ -5,6 +5,8 @@ import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class GameDAO implements GameDAI {
 
@@ -41,6 +43,15 @@ public class GameDAO implements GameDAI {
     @Override
     public void deleteAllGames() throws DataAccessException {
         games.clear();
+    }
+
+    @Override
+    public ArrayList<GameData> listAllGames() throws DataAccessException {
+        try {
+            return (ArrayList<GameData>) List.copyOf(games);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
 
