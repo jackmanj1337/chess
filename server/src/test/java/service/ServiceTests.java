@@ -1,14 +1,15 @@
 package service;
 
-import dataaccess.AuthDAO;
+import dataaccess.localstorage.AuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.localstorage.GameDAO;
+import dataaccess.localstorage.UserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
+import service.results.ListGamesResult;
 import service.results.LoginResult;
 import service.results.LogoutResult;
 import service.results.RegisterResult;
@@ -93,5 +94,22 @@ public class ServiceTests {
         assertEquals(401, linResult.httpCode());
 
     }
+
+    @Test
+    public void listAllGamesTest() throws DataAccessException {
+        GameService gameService = new GameService();
+        UserService userService = new UserService();
+        RegisterResult regResult = userService.registerNewUser(new RegisterRequest("doug", "dougspassword", "doug@arealwebsite.com"));
+        ListGamesResult listresult = gameService.listAllGames(regResult.authToken());
+        assertEquals(200, listresult.httpCode());
+    }
+
+    @Test
+    public void cannotListAllGamesWithoutAuthTest() throws DataAccessException {
+        GameService gameService = new GameService();
+        ListGamesResult listResult = gameService.listAllGames("very legit auth token");
+        assertEquals(401, listResult.httpCode());
+    }
+
 
 }

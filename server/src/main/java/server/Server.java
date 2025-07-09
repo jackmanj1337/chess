@@ -1,10 +1,9 @@
 package server;
 
 import handlers.DBHandler;
+import handlers.GameHandler;
 import handlers.UserHandler;
 import spark.*;
-
-import static handlers.UserHandler.handleRegisterNewUser;
 
 public class Server {
 
@@ -42,6 +41,9 @@ public class Server {
 
         Spark.delete("/db", DBHandler::handleClearDB);
         System.out.println("Registered DELETE /db");
+
+        Spark.get("/game", GameHandler::handleListAllGames);
+        System.out.println("Registered GET /game");
     }
 
 

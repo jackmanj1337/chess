@@ -1,11 +1,10 @@
-package dataaccess;
+package dataaccess.localstorage;
 
+import dataaccess.DataAccessException;
 import dataaccess.dainterface.GameDAI;
 import model.GameData;
-import model.UserData;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class GameDAO implements GameDAI {

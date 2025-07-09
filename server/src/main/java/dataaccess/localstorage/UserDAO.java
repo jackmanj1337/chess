@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.localstorage;
 
+import dataaccess.DataAccessException;
 import dataaccess.dainterface.UserDAI;
 import model.UserData;
 
