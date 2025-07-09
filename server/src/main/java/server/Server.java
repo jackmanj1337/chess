@@ -1,5 +1,6 @@
 package server;
 
+import handlers.DBHandler;
 import handlers.UserHandler;
 import spark.*;
 
@@ -38,6 +39,9 @@ public class Server {
 
         Spark.delete("/session", UserHandler::handleLogout);
         System.out.println("Registered DELETE /session");
+
+        Spark.delete("/db", DBHandler::handleClearDB);
+        System.out.println("Registered DELETE /db");
     }
 
 

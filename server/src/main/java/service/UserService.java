@@ -51,4 +51,11 @@ public class UserService {
         }
         return new LogoutResult(401, "unauthorized");
     }
+
+    public void clearAllUsersAndAuths() throws DataAccessException {
+        UserDAO userAccess = new UserDAO();
+        AuthDAO authAccess = new AuthDAO();
+        authAccess.deleteAllAuths();
+        userAccess.deleteAllUsers();
+    }
 }

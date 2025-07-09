@@ -9,14 +9,13 @@ import org.junit.jupiter.api.Test;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
-import service.UserService;
 import service.results.LoginResult;
 import service.results.LogoutResult;
 import service.results.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTests {
+public class ServiceTests {
     @BeforeEach
     public void setUp() throws DataAccessException {
         // Reset before each test
@@ -79,5 +78,20 @@ public class UserTests {
         assertEquals(401, linResult.httpCode(), "should have gotten a 401 response");
     }
 
+    @Test
+    public void clearDBTest() throws DataAccessException {
+        UserService userservice = new UserService();
+        GameService gameservice = new GameService();
+        userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
+        // add createGame call
+
+        userservice.clearAllUsersAndAuths();
+        gameservice.clearAllGames();
+
+        LoginResult linResult = userservice.login(new LoginRequest("doug", "pass"));
+        //add getGame call
+        assertEquals(401, linResult.httpCode());
+
+    }
 
 }
