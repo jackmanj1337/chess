@@ -14,9 +14,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        // registerRoutes();
-        Spark.post("/user", UserHandler::handleRegisterNewUser);
-        System.out.println("Registered POST /user");
+        registerRoutes();
+
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -32,7 +31,10 @@ public class Server {
 
     private void registerRoutes() {
         Spark.post("/user", UserHandler::handleRegisterNewUser);
+        System.out.println("Registered POST /user");
 
+        Spark.post("/session", UserHandler::handleLogin);
+        System.out.println("Registered POST /session");
     }
 
 

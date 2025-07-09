@@ -28,4 +28,21 @@ public class UserHandler {
 
         return "called successfully";
     }
+
+    public static Object handleLogin(Request req, Response res) throws DataAccessException {
+        System.out.println("handleLogin called");
+        LoginRequest loginInfo = gson.fromJson(req.body(), LoginRequest.class);
+        res.type("application/json");
+
+        if (loginInfo.username().isEmpty() || loginInfo.password().isEmpty()) {
+            res.status(400);
+        } else {
+            LoginResult result = userService.login(loginInfo);
+            res.status(result.httpCode());
+            return gson.toJson(result);
+        }
+
+
+        return "called successfully";
+    }
 }

@@ -9,7 +9,9 @@ public interface AuthDAI {
 
     public AuthData addAuth(AuthData auth) throws DataAccessException;
 
-    public AuthData getAuth(String auth) throws DataAccessException;
+    public AuthData getAuthFromToken(String auth) throws DataAccessException;
+
+    public AuthData getAuthFromUsername(String username) throws DataAccessException;
 
     public void deleteAuth(String authkey) throws DataAccessException;
 

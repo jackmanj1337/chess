@@ -30,11 +30,16 @@ public class UserService {
         AuthDAO authAccess = new AuthDAO();
         UserData loginTarget = userAccess.getUser(loginRequest.username());
         if (loginTarget == null) {
-            return new LoginResult(500, "Specified user does not exist", loginRequest.username(), null);
+            return new LoginResult(401, "unauthorized", loginRequest.username(), null);
         }
         if (loginRequest.password().equals(loginTarget.password())) {
-            String token = UUID.randomUUID().toString();
-            authAccess.addAuth(new AuthData(token, loginRequest.username()));
+            String token;
+            if (authAccess.getAuthFromUsername(loginRequest.username()) == null) {
+                token = UUID.randomUUID().toString();
+                authAccess.addAuth(new AuthData(token, loginRequest.username()));
+            } else {
+                token = authAccess.getAuthFromUsername(loginRequest.username()).authToken();
+            }
             return new LoginResult(200, "all good", loginRequest.username(), token);
         } else {
             return new LoginResult(401, "unauthorized", loginRequest.username(), null);

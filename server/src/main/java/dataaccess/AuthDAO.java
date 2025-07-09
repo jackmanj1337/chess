@@ -24,7 +24,7 @@ public class AuthDAO implements AuthDAI {
     }
 
     @Override
-    public AuthData getAuth(String auth) throws DataAccessException {
+    public AuthData getAuthFromToken(String auth) throws DataAccessException {
         for (AuthData authdata : auths) {
             if (auth.equals(authdata.authToken())) {
                 return authdata;
@@ -32,6 +32,17 @@ public class AuthDAO implements AuthDAI {
         }
         return null;
     }
+
+    @Override
+    public AuthData getAuthFromUsername(String username) throws DataAccessException {
+        for (AuthData auth : auths) {
+            if (username.equals(auth.username())) {
+                return auth;
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void deleteAuth(String authkey) throws DataAccessException {
