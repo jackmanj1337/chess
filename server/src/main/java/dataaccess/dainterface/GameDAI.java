@@ -1,4 +1,19 @@
 package dataaccess.dainterface;
 
+import dataaccess.DataAccessException;
+import model.GameData;
+
 public interface GameDAI {
+
+    public GameData addNewGame(GameData data) throws DataAccessException;
+
+    public GameData getGame(int gameID) throws DataAccessException;
+
+    public GameData updateGameData(GameData data) throws DataAccessException;
+
+    public void deleteGame(int gameID) throws DataAccessException;
+
+    public void deleteAllGames() throws DataAccessException;
+
+
 }
