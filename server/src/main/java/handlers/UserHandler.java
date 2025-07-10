@@ -9,39 +9,39 @@ import com.google.gson.Gson;
 
 
 public class UserHandler {
-    private static final Gson gson = new Gson();
-    private static final UserService userService = new UserService();
+    private static final Gson GSON = new Gson();
+    private static final UserService USER_SERVICE = new UserService();
 
     public static Object handleRegisterNewUser(Request req, Response res) throws DataAccessException {
         System.out.println("handleRegisterNewUser called");
-        RegisterRequest newUserInfo = gson.fromJson(req.body(), RegisterRequest.class);
+        RegisterRequest newUserInfo = GSON.fromJson(req.body(), RegisterRequest.class);
         res.type("application/json");
 
         if (newUserInfo.username() == null || newUserInfo.email() == null || newUserInfo.password() == null) {
             res.status(400);
             RegisterResult result = new RegisterResult(400, "Error: bad request", null, null);
-            return gson.toJson(result);
+            return GSON.toJson(result);
         } else {
-            RegisterResult result = userService.registerNewUser(newUserInfo);
+            RegisterResult result = USER_SERVICE.registerNewUser(newUserInfo);
             res.status(result.httpCode());
-            return gson.toJson(result);
+            return GSON.toJson(result);
         }
     }
 
     public static Object handleLogin(Request req, Response res) throws DataAccessException {
         System.out.println("handleLogin called");
-        LoginRequest loginInfo = gson.fromJson(req.body(), LoginRequest.class);
+        LoginRequest loginInfo = GSON.fromJson(req.body(), LoginRequest.class);
         res.type("application/json");
 
         if (loginInfo.username() == null || loginInfo.username().isEmpty() ||
                 loginInfo.password() == null || loginInfo.password().isEmpty()) {
             res.status(400);
             LoginResult result = new LoginResult(400, "Error: bad request", null, null);
-            return gson.toJson(result);
+            return GSON.toJson(result);
         } else {
-            LoginResult result = userService.login(loginInfo);
+            LoginResult result = USER_SERVICE.login(loginInfo);
             res.status(result.httpCode());
-            return gson.toJson(result);
+            return GSON.toJson(result);
         }
 
 
@@ -55,9 +55,9 @@ public class UserHandler {
         if (logoutInfo.authToken().isEmpty()) {
             res.status(400);
         } else {
-            LogoutResult result = userService.logout(logoutInfo);
+            LogoutResult result = USER_SERVICE.logout(logoutInfo);
             res.status(result.httpCode());
-            return gson.toJson(result);
+            return GSON.toJson(result);
         }
 
 

@@ -1,4 +1,4 @@
-package chess.MoveCalculator;
+package chess.movecalculator;
 
 import chess.ChessBoard;
 import chess.ChessMove;
@@ -23,24 +23,23 @@ public class KingCalculator extends MoveCalculator {
                 {0, -1}
         };
 
-        for (int[] direction : directions){
+        for (int[] direction : directions) {
             int tartgetRow = start.getRow();
             int targetCol = start.getColumn();
 
-                tartgetRow += direction[0];
-                targetCol += direction[1];
-                ChessPosition targetPosistion = new ChessPosition(tartgetRow, targetCol);
-                ValidationResults results = MoveValidator(board, start, targetPosistion);
-                if (results.moveOnBoard == true) {
-                    if (results.squareEmpty){
-                        AddMove(moves, start, targetPosistion, results);
-                    } else{
-                        if (results.capture){
-                            AddMove(moves, start, targetPosistion, results);
-                        }
+            tartgetRow += direction[0];
+            targetCol += direction[1];
+            ChessPosition targetPosistion = new ChessPosition(tartgetRow, targetCol);
+            ValidationResults results = moveValidator(board, start, targetPosistion);
+            if (results.moveOnBoard == true) {
+                if (results.squareEmpty) {
+                    addMove(moves, start, targetPosistion, results);
+                } else {
+                    if (results.capture) {
+                        addMove(moves, start, targetPosistion, results);
                     }
                 }
-
+            }
 
 
         }

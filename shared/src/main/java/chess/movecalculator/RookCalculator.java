@@ -1,4 +1,4 @@
-package chess.MoveCalculator;
+package chess.movecalculator;
 
 import chess.ChessBoard;
 import chess.ChessMove;
@@ -6,10 +6,10 @@ import chess.ChessPosition;
 
 import java.util.ArrayList;
 
-public class BishopCalculator extends MoveCalculator {
+public class RookCalculator extends MoveCalculator {
 
     @Override
     public ArrayList<ChessMove> calculate(ChessBoard board, ChessPosition start) {
-        return validateDiagonals(board, start);
+        return validateStraights(board, start);
     }
 }

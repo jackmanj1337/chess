@@ -128,9 +128,9 @@ public class ServiceTests {
         UserService userservice = new UserService();
         RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
         GameService gameservice = new GameService();
-        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
-        JoinGameResult JGResult = gameservice.joinGame(new JoinGameRequest(regResult.authToken(), "WHITE", CGResult.gameID()));
-        assertEquals(200, JGResult.httpCode());
+        CreateGameResult cGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
+        JoinGameResult jGResult = gameservice.joinGame(new JoinGameRequest(regResult.authToken(), "WHITE", cGResult.gameID()));
+        assertEquals(200, jGResult.httpCode());
 
     }
 
@@ -139,9 +139,9 @@ public class ServiceTests {
         UserService userservice = new UserService();
         RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
         GameService gameservice = new GameService();
-        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
-        JoinGameResult JGResult = gameservice.joinGame(new JoinGameRequest(regResult.authToken(), "GREEN", CGResult.gameID()));
-        assertEquals(400, JGResult.httpCode());
+        CreateGameResult cGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
+        JoinGameResult jGResult = gameservice.joinGame(new JoinGameRequest(regResult.authToken(), "GREEN", cGResult.gameID()));
+        assertEquals(400, jGResult.httpCode());
 
     }
 

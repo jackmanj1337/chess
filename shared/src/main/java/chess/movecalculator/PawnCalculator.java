@@ -1,4 +1,4 @@
-package chess.MoveCalculator;
+package chess.movecalculator;
 
 import chess.ChessBoard;
 import chess.ChessGame;
@@ -23,16 +23,16 @@ public class PawnCalculator extends MoveCalculator {
         targetRow = start.getRow() + directionModifier;
         targetCol = start.getColumn();
         target = new ChessPosition(targetRow, targetCol);
-        results = MoveValidator(board, start, target);
-        if (results.moveOnBoard == true){
-            if (results.squareEmpty == true){
-                AddMove(moves, start, target, results);
-                if (start.getRow() == ((directionModifier == 1) ? 2 : 7)){
+        results = moveValidator(board, start, target);
+        if (results.moveOnBoard == true) {
+            if (results.squareEmpty == true) {
+                addMove(moves, start, target, results);
+                if (start.getRow() == ((directionModifier == 1) ? 2 : 7)) {
                     targetRow += directionModifier;
                     target = new ChessPosition(targetRow, targetCol);
-                    results = MoveValidator(board, start, target);
-                    if (results.moveOnBoard == true && results.squareEmpty == true){
-                        AddMove(moves, start, target, results);
+                    results = moveValidator(board, start, target);
+                    if (results.moveOnBoard == true && results.squareEmpty == true) {
+                        addMove(moves, start, target, results);
                     }
                 }
 
@@ -40,16 +40,15 @@ public class PawnCalculator extends MoveCalculator {
         }
 
         //check capturing
-        for (int leftorright = -1; leftorright < 2; leftorright += 2){
+        for (int leftorright = -1; leftorright < 2; leftorright += 2) {
             targetRow = start.getRow() + directionModifier;
             targetCol = start.getColumn() + leftorright;
             target = new ChessPosition(targetRow, targetCol);
-            results = MoveValidator(board, start, target);
-            if (results.capture){
-                AddMove(moves, start, target, results);
+            results = moveValidator(board, start, target);
+            if (results.capture) {
+                addMove(moves, start, target, results);
             }
         }
-
 
 
         return moves;
