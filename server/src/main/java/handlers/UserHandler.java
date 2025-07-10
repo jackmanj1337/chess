@@ -34,8 +34,11 @@ public class UserHandler {
         LoginRequest loginInfo = gson.fromJson(req.body(), LoginRequest.class);
         res.type("application/json");
 
-        if (loginInfo.username().isEmpty() || loginInfo.password().isEmpty()) {
+        if (loginInfo.username() == null || loginInfo.username().isEmpty() ||
+                loginInfo.password() == null || loginInfo.password().isEmpty()) {
             res.status(400);
+            LoginResult result = new LoginResult(400, "Error: bad request", null, null);
+            return gson.toJson(result);
         } else {
             LoginResult result = userService.login(loginInfo);
             res.status(result.httpCode());
@@ -43,7 +46,6 @@ public class UserHandler {
         }
 
 
-        return "called successfully";
     }
 
     public static Object handleLogout(Request req, Response res) throws DataAccessException {
