@@ -6,13 +6,8 @@ import dataaccess.localstorage.GameDAO;
 import dataaccess.localstorage.UserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.requests.LoginRequest;
-import service.requests.LogoutRequest;
-import service.requests.RegisterRequest;
-import service.results.ListGamesResult;
-import service.results.LoginResult;
-import service.results.LogoutResult;
-import service.results.RegisterResult;
+import service.requests.*;
+import service.results.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -109,6 +104,45 @@ public class ServiceTests {
         GameService gameService = new GameService();
         ListGamesResult listResult = gameService.listAllGames("very legit auth token");
         assertEquals(401, listResult.httpCode());
+    }
+
+
+    @Test
+    public void createGameTest() throws DataAccessException {
+        UserService userservice = new UserService();
+        RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
+        GameService gameservice = new GameService();
+        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
+        assertEquals(200, CGResult.httpCode());
+    }
+
+    @Test
+    public void cannotCreateGameWithoutAuthTest() throws DataAccessException {
+        GameService gameservice = new GameService();
+        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(null, "really fun game"));
+        assertEquals(401, CGResult.httpCode());
+    }
+
+    @Test
+    public void joinGameAsWhite() throws DataAccessException {
+        UserService userservice = new UserService();
+        RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
+        GameService gameservice = new GameService();
+        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
+        JoinGameResult JGResult = gameservice.joinGame(new JoinGameRequest(regResult.authToken(), "WHITE", CGResult.gameID()));
+        assertEquals(200, JGResult.httpCode());
+
+    }
+
+    @Test
+    public void cannotJoinGameAsGreen() throws DataAccessException {
+        UserService userservice = new UserService();
+        RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
+        GameService gameservice = new GameService();
+        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
+        JoinGameResult JGResult = gameservice.joinGame(new JoinGameRequest(regResult.authToken(), "GREEN", CGResult.gameID()));
+        assertEquals(400, JGResult.httpCode());
+
     }
 
 
