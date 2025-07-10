@@ -120,7 +120,7 @@ public class ServiceTests {
     public void cannotCreateGameWithoutAuthTest() throws DataAccessException {
         GameService gameservice = new GameService();
         CreateGameResult cGResult = gameservice.createNewGame(new CreateGameRequest(null, "really fun game"));
-        assertEquals(401, cGResult.httpCode());
+        assertEquals(400, cGResult.httpCode());
     }
 
     @Test

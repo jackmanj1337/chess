@@ -422,7 +422,11 @@ public class ChessGame {
         if (!(o instanceof ChessGame chessGame)) {
             return false;
         }
-        return validMoveCount == chessGame.validMoveCount && activeTeam == chessGame.activeTeam && Objects.equals(getBoard(), chessGame.getBoard()) && Objects.deepEquals(allValidMoves, chessGame.allValidMoves);
+        return validMoveCount ==
+                chessGame.validMoveCount &&
+                activeTeam == chessGame.activeTeam &&
+                Objects.equals(getBoard(), chessGame.getBoard()) &&
+                Objects.deepEquals(allValidMoves, chessGame.allValidMoves);
     }
 
     @Override

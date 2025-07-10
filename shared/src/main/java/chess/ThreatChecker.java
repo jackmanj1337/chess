@@ -3,6 +3,44 @@ package chess;
 import java.util.Objects;
 
 public class ThreatChecker {
+
+    public static final int[][] KNIGHT_DIRECTIONS = new int[][]{
+            {2, 1},
+            {2, -1},
+            {-2, 1},
+            {-2, -1},
+            {1, 2},
+            {-1, 2},
+            {1, -2},
+            {-1, -2}
+    };
+    public static final int[][] PAWN_DIRECTIONS = new int[][]{
+            {1, 1},
+            {1, -1}
+    };
+    public static final int[][] KING_DIRECTIONS = new int[][]{
+            {1, 1},
+            {-1, 1},
+            {1, -1},
+            {-1, -1},
+            {1, 0},
+            {0, 1},
+            {-1, 0},
+            {0, -1}
+    };
+    public static final int[][] STRAIGHTS = new int[][]{
+            {1, 0},
+            {0, 1},
+            {-1, 0},
+            {0, -1}
+    };
+    public static final int[][] DIAGONALS = new int[][]{
+            {1, 1},
+            {-1, 1},
+            {1, -1},
+            {-1, -1}
+    };
+
     public static boolean isPositionThreatened(ChessBoard board, ChessPosition position) {
         boolean positionIsThreatened = false;
         ChessGame.TeamColor threateningColor;
@@ -11,44 +49,25 @@ public class ThreatChecker {
         } else {
             threateningColor = ChessGame.TeamColor.WHITE;
         }
-
         //check for knights
-        int[][] knightDirections = {
-                {2, 1},
-                {2, -1},
-                {-2, 1},
-                {-2, -1},
-                {1, 2},
-                {-1, 2},
-                {1, -2},
-                {-1, -2}
-        };
-
         positionIsThreatened =
                 isPositionDirectlyThreatened(
                         board,
                         position,
-                        knightDirections,
+                        KNIGHT_DIRECTIONS,
                         threateningColor,
                         positionIsThreatened,
                         ChessPiece.PieceType.KNIGHT
                 );
-
         if (positionIsThreatened) {
             return positionIsThreatened;
         }
-
         // Check for pawns
         int directionModifier = (threateningColor == ChessGame.TeamColor.BLACK) ? 1 : -1;
-        int[][] pawnDirections = {
-                {1, 1},
-                {1, -1}
-        };
 
-        for (int[] direction : pawnDirections) {
+        for (int[] direction : PAWN_DIRECTIONS) {
             int targetRow = position.getRow();
             int targetCol = position.getColumn();
-
             targetRow += direction[0] * directionModifier;
             targetCol += direction[1];
             if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
@@ -62,77 +81,45 @@ public class ThreatChecker {
                     }
                 }
             }
-
-
         }
-
         // Check for opposing king
-        int[][] kingDirections = {
-                {1, 1},
-                {-1, 1},
-                {1, -1},
-                {-1, -1},
-                {1, 0},
-                {0, 1},
-                {-1, 0},
-                {0, -1}
-        };
-
         positionIsThreatened =
                 isPositionDirectlyThreatened(
                         board,
                         position,
-                        kingDirections,
+                        KING_DIRECTIONS,
                         threateningColor,
                         positionIsThreatened,
                         ChessPiece.PieceType.KING
                 );
-
         if (positionIsThreatened) {
             return positionIsThreatened;
         }
 
         // check straights for rooks and queens
-        int[][] straights = {
-                {1, 0},
-                {0, 1},
-                {-1, 0},
-                {0, -1}
-        };
-
         positionIsThreatened =
                 isPositionRemotelyThreatened(
                         board,
                         position,
-                        straights,
+                        STRAIGHTS,
                         threateningColor,
                         positionIsThreatened,
                         ChessPiece.PieceType.ROOK
                 );
-
         if (positionIsThreatened) {
             return positionIsThreatened;
         }
 
-
         // check diagonals for bishops and queens
-        int[][] diagonals = {
-                {1, 1},
-                {-1, 1},
-                {1, -1},
-                {-1, -1}
-        };
-
         positionIsThreatened =
                 isPositionRemotelyThreatened(
                         board,
                         position,
-                        diagonals,
+                        DIAGONALS,
                         threateningColor,
                         positionIsThreatened,
                         ChessPiece.PieceType.BISHOP
                 );
-
         return positionIsThreatened;
     }
 
