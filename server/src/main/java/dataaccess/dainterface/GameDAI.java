@@ -14,7 +14,7 @@ public interface GameDAI {
 
     public GameData updateGameData(GameData data) throws DataAccessException;
 
-    public void deleteGame(int gameID) throws DataAccessException;
+    //public void deleteGame(int gameID) throws DataAccessException;
 
     public void deleteAllGames() throws DataAccessException;
 

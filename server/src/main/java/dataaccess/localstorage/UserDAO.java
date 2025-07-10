@@ -35,10 +35,12 @@ public class UserDAO implements UserDAI {
         return null;
     }
 
+    /*
     @Override
     public void deleteUser(String username) throws DataAccessException {
         users.removeIf(user -> username.equals(user.username()));
     }
+     */
 
     @Override
     public void deleteAllUsers() throws DataAccessException {
