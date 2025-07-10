@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.localstorage.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.localstorage.GameDAO;
@@ -35,10 +36,14 @@ public class GameService {
         AuthDAO authAccess = new AuthDAO();
         if (authAccess.getAuthFromToken(request.authToken()) != null) {
             GameDAO gamesAccess = new GameDAO();
-
-            return new
+            int id;
+            do {
+                id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
+            } while (gamesAccess.getGame(id) != null);
+            gamesAccess.addNewGame(new GameData(id, null, null, request.gameName(), new ChessGame()));
+            return new CreateGameResults(200, "all good", id);
         } else {
-            return new CreateGameResults(401, "Error: unauthorized", null);
+            return new CreateGameResults(401, "Error: unauthorized", -1);
         }
     }
 

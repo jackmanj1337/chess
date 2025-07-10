@@ -44,6 +44,8 @@ public class Server {
 
         Spark.get("/game", GameHandler::handleListAllGames);
         System.out.println("Registered GET /game");
+
+        Spark.post("/game", GameHandler::handleCreateNewGame);
     }
 
 
