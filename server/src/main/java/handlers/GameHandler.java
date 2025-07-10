@@ -4,8 +4,9 @@ import dataaccess.DataAccessException;
 import service.GameService;
 import service.UserService;
 import service.requests.CreateGameRequest;
-import service.requests.LoginRequest;
-import service.results.CreateGameResults;
+import service.requests.JoinGameRequest;
+import service.results.CreateGameResult;
+import service.results.JoinGameResult;
 import service.results.ListGamesResult;
 import spark.*;
 import com.google.gson.Gson;
@@ -30,7 +31,18 @@ public class GameHandler {
         System.out.println("handleCreateNewGame called");
         CreateGameRequest requestp1 = gson.fromJson(req.body(), CreateGameRequest.class);
         CreateGameRequest request = new CreateGameRequest(req.headers("Authorization"), requestp1.gameName());
-        CreateGameResults results = gameService.createNewGame(request);
+        CreateGameResult results = gameService.createNewGame(request);
+
+        res.status(results.httpCode());
+        res.type("application/json");
+        return gson.toJson(results);
+    }
+
+    public static Object handleJoinGame(Request req, Response res) throws DataAccessException {
+        System.out.println("handleJoinGame called");
+        JoinGameRequest requestp1 = gson.fromJson(req.body(), JoinGameRequest.class);
+        JoinGameRequest request = new JoinGameRequest(req.headers("Authorization"), requestp1.playerColor(), requestp1.gameID());
+        JoinGameResult results = gameService.joinGame(request);
 
         res.status(results.httpCode());
         res.type("application/json");

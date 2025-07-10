@@ -46,11 +46,7 @@ public class GameDAO implements GameDAI {
 
     @Override
     public ArrayList<GameData> listAllGames() throws DataAccessException {
-        try {
-            return (ArrayList<GameData>) List.copyOf(games);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
+        return new ArrayList<>(games);
     }
 
 

@@ -46,6 +46,8 @@ public class Server {
         System.out.println("Registered GET /game");
 
         Spark.post("/game", GameHandler::handleCreateNewGame);
+
+        Spark.put("/game", GameHandler::handleJoinGame);
     }
 
 

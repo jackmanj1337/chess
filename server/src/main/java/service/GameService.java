@@ -6,11 +6,13 @@ import dataaccess.DataAccessException;
 import dataaccess.localstorage.GameDAO;
 import model.GameData;
 import service.requests.CreateGameRequest;
-import service.results.CreateGameResults;
+import service.requests.JoinGameRequest;
+import service.results.CreateGameResult;
+import service.results.JoinGameResult;
 import service.results.ListGamesResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -32,7 +34,7 @@ public class GameService {
 
     }
 
-    public CreateGameResults createNewGame(CreateGameRequest request) throws DataAccessException {
+    public CreateGameResult createNewGame(CreateGameRequest request) throws DataAccessException {
         AuthDAO authAccess = new AuthDAO();
         if (authAccess.getAuthFromToken(request.authToken()) != null) {
             GameDAO gamesAccess = new GameDAO();
@@ -41,9 +43,53 @@ public class GameService {
                 id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
             } while (gamesAccess.getGame(id) != null);
             gamesAccess.addNewGame(new GameData(id, null, null, request.gameName(), new ChessGame()));
-            return new CreateGameResults(200, "all good", id);
+            return new CreateGameResult(200, "all good", id);
         } else {
-            return new CreateGameResults(401, "Error: unauthorized", -1);
+            return new CreateGameResult(401, "Error: unauthorized", -1);
+        }
+    }
+
+    public JoinGameResult joinGame(JoinGameRequest request) throws DataAccessException {
+        AuthDAO authAccess = new AuthDAO();
+        if (authAccess.getAuthFromToken(request.authToken()) != null) {
+            GameDAO gamesAccess = new GameDAO();
+            GameData oldGame = gamesAccess.getGame(request.gameID());
+            if (oldGame == null) {
+                return new JoinGameResult(400, "bad request");
+            } else {
+                if (Objects.equals(request.playerColor(), "WHITE")) {
+                    if (oldGame.whiteUsername() == null) {
+                        gamesAccess.updateGameData(new GameData(
+                                oldGame.gameID(),
+                                authAccess.getAuthFromToken(request.authToken()).username(),
+                                oldGame.blackUsername(),
+                                oldGame.gameName(),
+                                oldGame.game()
+                        ));
+                        return new JoinGameResult(200, "all good");
+                    } else {
+                        return new JoinGameResult(403, "already taken");
+                    }
+                } else if ((Objects.equals(request.playerColor(), "BLACK"))) {
+                    if (oldGame.blackUsername() == null) {
+                        gamesAccess.updateGameData(new GameData(
+                                oldGame.gameID(),
+                                oldGame.whiteUsername(),
+                                authAccess.getAuthFromToken(request.authToken()).username(),
+                                oldGame.gameName(),
+                                oldGame.game()
+                        ));
+                        return new JoinGameResult(200, "all good");
+                    } else {
+                        return new JoinGameResult(403, "already taken");
+                    }
+                } else {
+                    return new JoinGameResult(400, "bad request");
+                }
+            }
+
+        } else {
+            return new JoinGameResult(401, "Error: unauthorized");
         }
     }
 
