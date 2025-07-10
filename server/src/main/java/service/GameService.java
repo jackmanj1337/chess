@@ -55,7 +55,7 @@ public class GameService {
             GameDAO gamesAccess = new GameDAO();
             GameData oldGame = gamesAccess.getGame(request.gameID());
             if (oldGame == null) {
-                return new JoinGameResult(400, "bad request");
+                return new JoinGameResult(400, "Error: bad request");
             } else {
                 if (Objects.equals(request.playerColor(), "WHITE")) {
                     if (oldGame.whiteUsername() == null) {
@@ -68,7 +68,7 @@ public class GameService {
                         ));
                         return new JoinGameResult(200, "all good");
                     } else {
-                        return new JoinGameResult(403, "already taken");
+                        return new JoinGameResult(403, "Error: already taken");
                     }
                 } else if ((Objects.equals(request.playerColor(), "BLACK"))) {
                     if (oldGame.blackUsername() == null) {
@@ -81,10 +81,10 @@ public class GameService {
                         ));
                         return new JoinGameResult(200, "all good");
                     } else {
-                        return new JoinGameResult(403, "already taken");
+                        return new JoinGameResult(403, "Error: already taken");
                     }
                 } else {
-                    return new JoinGameResult(400, "bad request");
+                    return new JoinGameResult(400, "Error: bad request");
                 }
             }
 

@@ -31,7 +31,7 @@ public class UserService {
         AuthDAO authAccess = new AuthDAO();
         UserData loginTarget = userAccess.getUser(loginRequest.username());
         if (loginTarget == null) {
-            return new LoginResult(401, "unauthorized", loginRequest.username(), null);
+            return new LoginResult(401, "Error: unauthorized", loginRequest.username(), null);
         }
         if (loginRequest.password().equals(loginTarget.password())) {
             String token;
@@ -39,7 +39,7 @@ public class UserService {
             authAccess.addAuth(new AuthData(token, loginRequest.username()));
             return new LoginResult(200, "all good", loginRequest.username(), token);
         } else {
-            return new LoginResult(401, "unauthorized", loginRequest.username(), null);
+            return new LoginResult(401, "Error: unauthorized", loginRequest.username(), null);
         }
     }
 
@@ -49,7 +49,7 @@ public class UserService {
             authAccess.deleteAuth(logoutRequest.authToken());
             return new LogoutResult(200, "all good");
         }
-        return new LogoutResult(401, "unauthorized");
+        return new LogoutResult(401, "Error: unauthorized");
     }
 
     public void clearAllUsersAndAuths() throws DataAccessException {
