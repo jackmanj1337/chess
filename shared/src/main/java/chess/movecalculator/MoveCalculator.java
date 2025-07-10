@@ -86,28 +86,7 @@ public abstract class MoveCalculator {
                 {0, -1}
         };
 
-        for (int[] direction : directions) {
-            int tartgetRow = start.getRow();
-            int targetCol = start.getColumn();
-            while (true) {
-                tartgetRow += direction[0];
-                targetCol += direction[1];
-                ChessPosition targetPosistion = new ChessPosition(tartgetRow, targetCol);
-                ValidationResults results = moveValidator(board, start, targetPosistion);
-                if (results.moveOnBoard == false) {
-                    break;
-                }
-                if (results.squareEmpty) {
-                    addMove(moves, start, targetPosistion, results);
-                } else {
-                    if (results.capture) {
-                        addMove(moves, start, targetPosistion, results);
-                    }
-                    break;
-                }
-
-            }
-        }
+        continuousDirectionalMoveValidator(board, start, directions, moves);
 
 
         return moves;
@@ -123,6 +102,13 @@ public abstract class MoveCalculator {
                 {-1, -1}
         };
 
+        continuousDirectionalMoveValidator(board, start, directions, moves);
+
+
+        return moves;
+    }
+
+    private void continuousDirectionalMoveValidator(ChessBoard board, ChessPosition start, int[][] directions, ArrayList<ChessMove> moves) {
         for (int[] direction : directions) {
             int tartgetRow = start.getRow();
             int targetCol = start.getColumn();
@@ -145,9 +131,27 @@ public abstract class MoveCalculator {
 
             }
         }
+    }
 
+    protected void singleStepRelativeMoveValidator(ChessBoard board, ChessPosition start, int[][] directions, ArrayList<ChessMove> moves) {
+        for (int[] direction : directions) {
+            int tartgetRow = start.getRow();
+            int targetCol = start.getColumn();
 
-        return moves;
+            tartgetRow += direction[0];
+            targetCol += direction[1];
+            ChessPosition targetPosistion = new ChessPosition(tartgetRow, targetCol);
+            ValidationResults results = moveValidator(board, start, targetPosistion);
+            if (results.moveOnBoard == true) {
+                if (results.squareEmpty) {
+                    addMove(moves, start, targetPosistion, results);
+                } else {
+                    if (results.capture) {
+                        addMove(moves, start, targetPosistion, results);
+                    }
+                }
+            }
+        }
     }
 
 

@@ -72,7 +72,7 @@ public class ChessGame {
     }
 
     public boolean isPositionThreatened(ChessBoard board, ChessPosition position) {
-        boolean positionIsthreatened = false;
+        boolean positionIsThreatened = false;
         TeamColor threateningColor;
         if (board.getPiece(position).getTeamColor() == TeamColor.WHITE) {
             threateningColor = TeamColor.BLACK;
@@ -92,25 +92,10 @@ public class ChessGame {
                 {-1, -2}
         };
 
-        for (int[] direction : knightDirections) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
+        positionIsThreatened = isPositionDirectlyThreatened(board, position, knightDirections, threateningColor, positionIsThreatened);
 
-            targetRow += direction[0];
-            targetCol += direction[1];
-            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (threateningPiece != null) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
-                        positionIsthreatened = true;
-                        return positionIsthreatened;
-                    }
-                }
-            }
-
-
+        if (positionIsThreatened) {
+            return positionIsThreatened;
         }
 
         // Check for pawns
@@ -132,8 +117,8 @@ public class ChessGame {
                 if (threateningPiece != null) {
                     if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
                             Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.PAWN)) {
-                        positionIsthreatened = true;
-                        return positionIsthreatened;
+                        positionIsThreatened = true;
+                        return positionIsThreatened;
                     }
                 }
             }
@@ -153,24 +138,10 @@ public class ChessGame {
                 {0, -1}
         };
 
-        for (int[] direction : kingDirections) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
+        positionIsThreatened = isPositionDirectlyThreatened(board, position, kingDirections, threateningColor, positionIsThreatened);
 
-            targetRow += direction[0];
-            targetCol += direction[1];
-            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (threateningPiece != null) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KING)) {
-                        positionIsthreatened = true;
-                        return positionIsthreatened;
-                    }
-                }
-            }
-
+        if (positionIsThreatened) {
+            return positionIsThreatened;
         }
 
         // check straights for rooks and queens
@@ -181,33 +152,11 @@ public class ChessGame {
                 {0, -1}
         };
 
-        for (int[] direction : straights) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
-            while (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                targetRow += direction[0];
-                targetCol += direction[1];
-                if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                    ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                    ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                    if (threateningPiece != null) {
-                        if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
-                            if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.ROOK) ||
-                                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
-                                positionIsthreatened = true;
-                                return positionIsthreatened;
-                            } else {
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-
-            }
+        positionIsThreatened = isPositionRemotelyThreatened(board, position, straights, threateningColor, positionIsThreatened);
+        if (positionIsThreatened) {
+            return positionIsThreatened;
         }
+
 
         // check diagonals for bishops and queens
         int[][] diagonals = {
@@ -217,6 +166,12 @@ public class ChessGame {
                 {-1, -1}
         };
 
+        positionIsThreatened = isPositionRemotelyThreatened(board, position, diagonals, threateningColor, positionIsThreatened);
+
+        return positionIsThreatened;
+    }
+
+    private static boolean isPositionRemotelyThreatened(ChessBoard board, ChessPosition position, int[][] diagonals, TeamColor threateningColor, boolean positionIsthreatened) {
         for (int[] direction : diagonals) {
             int targetRow = position.getRow();
             int targetCol = position.getColumn();
@@ -231,7 +186,6 @@ public class ChessGame {
                             if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.BISHOP) ||
                                     Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
                                 positionIsthreatened = true;
-                                return positionIsthreatened;
                             } else {
                                 break;
                             }
@@ -241,12 +195,29 @@ public class ChessGame {
 
                     }
                 }
-
-
             }
         }
+        return positionIsthreatened;
+    }
 
+    private static boolean isPositionDirectlyThreatened(ChessBoard board, ChessPosition position, int[][] knightDirections, TeamColor threateningColor, boolean positionIsthreatened) {
+        for (int[] direction : knightDirections) {
+            int targetRow = position.getRow();
+            int targetCol = position.getColumn();
 
+            targetRow += direction[0];
+            targetCol += direction[1];
+            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
+                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
+                ChessPiece threateningPiece = board.getPiece(threateningPosition);
+                if (threateningPiece != null) {
+                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
+                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
+                        positionIsthreatened = true;
+                    }
+                }
+            }
+        }
         return positionIsthreatened;
     }
 

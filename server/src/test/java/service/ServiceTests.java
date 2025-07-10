@@ -112,15 +112,15 @@ public class ServiceTests {
         UserService userservice = new UserService();
         RegisterResult regResult = userservice.registerNewUser(new RegisterRequest("doug", "pass", "doug@testing.com"));
         GameService gameservice = new GameService();
-        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
-        assertEquals(200, CGResult.httpCode());
+        CreateGameResult cGResult = gameservice.createNewGame(new CreateGameRequest(regResult.authToken(), "really fun game"));
+        assertEquals(200, cGResult.httpCode());
     }
 
     @Test
     public void cannotCreateGameWithoutAuthTest() throws DataAccessException {
         GameService gameservice = new GameService();
-        CreateGameResult CGResult = gameservice.createNewGame(new CreateGameRequest(null, "really fun game"));
-        assertEquals(401, CGResult.httpCode());
+        CreateGameResult cGResult = gameservice.createNewGame(new CreateGameRequest(null, "really fun game"));
+        assertEquals(401, cGResult.httpCode());
     }
 
     @Test
