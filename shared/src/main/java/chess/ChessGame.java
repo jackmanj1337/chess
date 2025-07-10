@@ -92,7 +92,7 @@ public class ChessGame {
                 {-1, -2}
         };
 
-        positionIsThreatened = isPositionDirectlyThreatened(board, position, knightDirections, threateningColor, positionIsThreatened);
+        positionIsThreatened = isPositionDirectlyThreatened(board, position, knightDirections, threateningColor, positionIsThreatened, ChessPiece.PieceType.KNIGHT);
 
         if (positionIsThreatened) {
             return positionIsThreatened;
@@ -138,7 +138,7 @@ public class ChessGame {
                 {0, -1}
         };
 
-        positionIsThreatened = isPositionDirectlyThreatened(board, position, kingDirections, threateningColor, positionIsThreatened);
+        positionIsThreatened = isPositionDirectlyThreatened(board, position, kingDirections, threateningColor, positionIsThreatened, ChessPiece.PieceType.KING);
 
         if (positionIsThreatened) {
             return positionIsThreatened;
@@ -152,7 +152,7 @@ public class ChessGame {
                 {0, -1}
         };
 
-        positionIsThreatened = isPositionRemotelyThreatened(board, position, straights, threateningColor, positionIsThreatened);
+        positionIsThreatened = isPositionRemotelyThreatened(board, position, straights, threateningColor, positionIsThreatened, ChessPiece.PieceType.ROOK);
         if (positionIsThreatened) {
             return positionIsThreatened;
         }
@@ -166,12 +166,12 @@ public class ChessGame {
                 {-1, -1}
         };
 
-        positionIsThreatened = isPositionRemotelyThreatened(board, position, diagonals, threateningColor, positionIsThreatened);
+        positionIsThreatened = isPositionRemotelyThreatened(board, position, diagonals, threateningColor, positionIsThreatened, ChessPiece.PieceType.BISHOP);
 
         return positionIsThreatened;
     }
 
-    private static boolean isPositionRemotelyThreatened(ChessBoard board, ChessPosition position, int[][] diagonals, TeamColor threateningColor, boolean positionIsthreatened) {
+    private static boolean isPositionRemotelyThreatened(ChessBoard board, ChessPosition position, int[][] diagonals, TeamColor threateningColor, boolean positionIsthreatened, ChessPiece.PieceType threateningPieceType) {
         for (int[] direction : diagonals) {
             int targetRow = position.getRow();
             int targetCol = position.getColumn();
@@ -183,7 +183,7 @@ public class ChessGame {
                     ChessPiece threateningPiece = board.getPiece(threateningPosition);
                     if (threateningPiece != null) {
                         if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
-                            if (Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.BISHOP) ||
+                            if (Objects.equals(threateningPiece.getPieceType(), threateningPieceType) ||
                                     Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
                                 positionIsthreatened = true;
                             } else {
@@ -200,7 +200,7 @@ public class ChessGame {
         return positionIsthreatened;
     }
 
-    private static boolean isPositionDirectlyThreatened(ChessBoard board, ChessPosition position, int[][] knightDirections, TeamColor threateningColor, boolean positionIsthreatened) {
+    private static boolean isPositionDirectlyThreatened(ChessBoard board, ChessPosition position, int[][] knightDirections, TeamColor threateningColor, boolean positionIsthreatened, ChessPiece.PieceType threateningPieceType) {
         for (int[] direction : knightDirections) {
             int targetRow = position.getRow();
             int targetCol = position.getColumn();
@@ -212,7 +212,7 @@ public class ChessGame {
                 ChessPiece threateningPiece = board.getPiece(threateningPosition);
                 if (threateningPiece != null) {
                     if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.KNIGHT)) {
+                            Objects.equals(threateningPiece.getPieceType(), threateningPieceType)) {
                         positionIsthreatened = true;
                     }
                 }
