@@ -36,6 +36,9 @@ public class GameService {
 
     public CreateGameResult createNewGame(CreateGameRequest request) throws DataAccessException {
         AuthDAO authAccess = new AuthDAO();
+        if (request.authToken() == null || request.gameName() == null) {
+            return new CreateGameResult(400, "Error: bad request", null);
+        }
         if (authAccess.getAuthFromToken(request.authToken()) != null) {
             GameDAO gamesAccess = new GameDAO();
             int id;
@@ -45,7 +48,7 @@ public class GameService {
             gamesAccess.addNewGame(new GameData(id, null, null, request.gameName(), new ChessGame()));
             return new CreateGameResult(200, "all good", id);
         } else {
-            return new CreateGameResult(401, "Error: unauthorized", -1);
+            return new CreateGameResult(401, "Error: unauthorized", null);
         }
     }
 
