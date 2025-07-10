@@ -17,16 +17,15 @@ public class UserHandler {
         RegisterRequest newUserInfo = gson.fromJson(req.body(), RegisterRequest.class);
         res.type("application/json");
 
-        if (newUserInfo.username().isEmpty() || newUserInfo.email().isEmpty() || newUserInfo.password().isEmpty()) {
+        if (newUserInfo.username() == null || newUserInfo.email() == null || newUserInfo.password() == null) {
             res.status(400);
+            RegisterResult result = new RegisterResult(400, "Error: bad request", null, null);
+            return gson.toJson(result);
         } else {
             RegisterResult result = userService.registerNewUser(newUserInfo);
             res.status(result.httpCode());
             return gson.toJson(result);
         }
-
-
-        return "called successfully";
     }
 
     public static Object handleLogin(Request req, Response res) throws DataAccessException {
