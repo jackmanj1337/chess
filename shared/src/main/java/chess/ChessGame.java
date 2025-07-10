@@ -2,6 +2,8 @@ package chess;
 
 import java.util.*;
 
+import chess.ThreatChecker;
+
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -71,156 +73,6 @@ public class ChessGame {
         return new ChessPosition(0, 0); // no king of the appropriate color found;
     }
 
-    public boolean isPositionThreatened(ChessBoard board, ChessPosition position) {
-        boolean positionIsThreatened = false;
-        TeamColor threateningColor;
-        if (board.getPiece(position).getTeamColor() == TeamColor.WHITE) {
-            threateningColor = TeamColor.BLACK;
-        } else {
-            threateningColor = TeamColor.WHITE;
-        }
-
-        //check for knights
-        int[][] knightDirections = {
-                {2, 1},
-                {2, -1},
-                {-2, 1},
-                {-2, -1},
-                {1, 2},
-                {-1, 2},
-                {1, -2},
-                {-1, -2}
-        };
-
-        positionIsThreatened = isPositionDirectlyThreatened(board, position, knightDirections, threateningColor, positionIsThreatened, ChessPiece.PieceType.KNIGHT);
-
-        if (positionIsThreatened) {
-            return positionIsThreatened;
-        }
-
-        // Check for pawns
-        int directionModifier = (threateningColor == TeamColor.BLACK) ? 1 : -1;
-        int[][] pawnDirections = {
-                {1, 1},
-                {1, -1}
-        };
-
-        for (int[] direction : pawnDirections) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
-
-            targetRow += direction[0] * directionModifier;
-            targetCol += direction[1];
-            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (threateningPiece != null) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                            Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.PAWN)) {
-                        positionIsThreatened = true;
-                        return positionIsThreatened;
-                    }
-                }
-            }
-
-
-        }
-
-        // Check for opposing king
-        int[][] kingDirections = {
-                {1, 1},
-                {-1, 1},
-                {1, -1},
-                {-1, -1},
-                {1, 0},
-                {0, 1},
-                {-1, 0},
-                {0, -1}
-        };
-
-        positionIsThreatened = isPositionDirectlyThreatened(board, position, kingDirections, threateningColor, positionIsThreatened, ChessPiece.PieceType.KING);
-
-        if (positionIsThreatened) {
-            return positionIsThreatened;
-        }
-
-        // check straights for rooks and queens
-        int[][] straights = {
-                {1, 0},
-                {0, 1},
-                {-1, 0},
-                {0, -1}
-        };
-
-        positionIsThreatened = isPositionRemotelyThreatened(board, position, straights, threateningColor, positionIsThreatened, ChessPiece.PieceType.ROOK);
-        if (positionIsThreatened) {
-            return positionIsThreatened;
-        }
-
-
-        // check diagonals for bishops and queens
-        int[][] diagonals = {
-                {1, 1},
-                {-1, 1},
-                {1, -1},
-                {-1, -1}
-        };
-
-        positionIsThreatened = isPositionRemotelyThreatened(board, position, diagonals, threateningColor, positionIsThreatened, ChessPiece.PieceType.BISHOP);
-
-        return positionIsThreatened;
-    }
-
-    private static boolean isPositionRemotelyThreatened(ChessBoard board, ChessPosition position, int[][] diagonals, TeamColor threateningColor, boolean positionIsthreatened, ChessPiece.PieceType threateningPieceType) {
-        for (int[] direction : diagonals) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
-            while (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                targetRow += direction[0];
-                targetCol += direction[1];
-                if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                    ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                    ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                    if (threateningPiece != null) {
-                        if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
-                            if (Objects.equals(threateningPiece.getPieceType(), threateningPieceType) ||
-                                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
-                                positionIsthreatened = true;
-                            } else {
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-
-                    }
-                }
-            }
-        }
-        return positionIsthreatened;
-    }
-
-    private static boolean isPositionDirectlyThreatened(ChessBoard board, ChessPosition position, int[][] knightDirections, TeamColor threateningColor, boolean positionIsthreatened, ChessPiece.PieceType threateningPieceType) {
-        for (int[] direction : knightDirections) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
-
-            targetRow += direction[0];
-            targetCol += direction[1];
-            if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                if (threateningPiece != null) {
-                    if (Objects.equals(threateningPiece.getTeamColor(), threateningColor) &&
-                            Objects.equals(threateningPiece.getPieceType(), threateningPieceType)) {
-                        positionIsthreatened = true;
-                    }
-                }
-            }
-        }
-        return positionIsthreatened;
-    }
-
 
     private void makeTestMove(ChessBoard testingBoard, ChessMove move) {
         int startRow = move.getStartPosition().getRow() - 1;
@@ -247,10 +99,10 @@ public class ChessGame {
                 ChessBoard testingGrounds = new ChessBoard(board);
                 ChessMove move = new ChessMove(position, new ChessPosition(1, 6), null);
                 makeTestMove(testingGrounds, move);
-                if (!isPositionThreatened(testingGrounds, new ChessPosition(1, 6))) {
+                if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(1, 6))) {
                     move = new ChessMove(new ChessPosition(1, 6), new ChessPosition(1, 7), null);
                     makeTestMove(testingGrounds, move);
-                    if (!isPositionThreatened(testingGrounds, new ChessPosition(1, 7))) {
+                    if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(1, 7))) {
                         moves.add(new ChessMove(position, new ChessPosition(1, 7), null));
                     }
                 }
@@ -262,10 +114,10 @@ public class ChessGame {
                 ChessBoard testingGrounds = new ChessBoard(board);
                 ChessMove move = new ChessMove(position, new ChessPosition(1, 4), null);
                 makeTestMove(testingGrounds, move);
-                if (!isPositionThreatened(testingGrounds, new ChessPosition(1, 4))) {
+                if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(1, 4))) {
                     move = new ChessMove(new ChessPosition(1, 4), new ChessPosition(1, 3), null);
                     makeTestMove(testingGrounds, move);
-                    if (!isPositionThreatened(testingGrounds, new ChessPosition(1, 3))) {
+                    if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(1, 3))) {
                         moves.add(new ChessMove(position, new ChessPosition(1, 3), null));
                     }
                 }
@@ -278,10 +130,10 @@ public class ChessGame {
                 ChessBoard testingGrounds = new ChessBoard(board);
                 ChessMove move = new ChessMove(position, new ChessPosition(8, 6), null);
                 makeTestMove(testingGrounds, move);
-                if (!isPositionThreatened(testingGrounds, new ChessPosition(8, 6))) {
+                if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(8, 6))) {
                     move = new ChessMove(new ChessPosition(8, 6), new ChessPosition(8, 7), null);
                     makeTestMove(testingGrounds, move);
-                    if (!isPositionThreatened(testingGrounds, new ChessPosition(8, 7))) {
+                    if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(8, 7))) {
                         moves.add(new ChessMove(position, new ChessPosition(8, 7), null));
                     }
                 }
@@ -293,10 +145,10 @@ public class ChessGame {
                 ChessBoard testingGrounds = new ChessBoard(board);
                 ChessMove move = new ChessMove(position, new ChessPosition(8, 4), null);
                 makeTestMove(testingGrounds, move);
-                if (!isPositionThreatened(testingGrounds, new ChessPosition(8, 4))) {
+                if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(8, 4))) {
                     move = new ChessMove(new ChessPosition(8, 4), new ChessPosition(8, 3), null);
                     makeTestMove(testingGrounds, move);
-                    if (!isPositionThreatened(testingGrounds, new ChessPosition(8, 3))) {
+                    if (!ThreatChecker.isPositionThreatened(testingGrounds, new ChessPosition(8, 3))) {
                         moves.add(new ChessMove(position, new ChessPosition(8, 3), null));
                     }
                 }
@@ -339,7 +191,7 @@ public class ChessGame {
             ChessBoard testingGrounds = new ChessBoard(board);
             makeTestMove(testingGrounds, move);
             ChessPosition activeKing = findKing(defending, testingGrounds);
-            if (isPositionThreatened(testingGrounds, activeKing)) {
+            if (ThreatChecker.isPositionThreatened(testingGrounds, activeKing)) {
                 iter.remove();
             }
         }
@@ -394,6 +246,40 @@ public class ChessGame {
             throw new InvalidMoveException("No legal moves exist for that piece");
         }
 
+        governCastle(move);
+
+        //Check if we did EnPassant
+        governEnPassant(move);
+
+
+        TeamColor nextPlayer;
+        if (getTeamTurn() == TeamColor.WHITE) {
+            nextPlayer = TeamColor.BLACK;
+        } else {
+            nextPlayer = TeamColor.WHITE;
+        }
+        setTeamTurn(nextPlayer);
+    }
+
+    private void governEnPassant(ChessMove move) {
+        if (Objects.equals(enPassantDestination, move.getEndPosition()) && board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
+            board.removePiece(enPassantablePawn);
+        }
+
+        //check if next player can EnPassant
+        if ((move.getStartPosition().getRow() == 2) && (move.getEndPosition().getRow() == 4) && (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN)) {
+            enPassantablePawn = move.getEndPosition();
+            enPassantDestination = new ChessPosition(3, enPassantablePawn.getColumn());
+        } else if ((move.getStartPosition().getRow() == 7) && (move.getEndPosition().getRow() == 5) && (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN)) {
+            enPassantablePawn = move.getEndPosition();
+            enPassantDestination = new ChessPosition(6, enPassantablePawn.getColumn());
+        } else {
+            enPassantablePawn = null;
+            enPassantDestination = null;
+        }
+    }
+
+    private void governCastle(ChessMove move) {
         ChessMove whiteQueenSideCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null);
         ChessMove whiteKingSideCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null);
         ChessMove blackQueenSideCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null);
@@ -434,24 +320,6 @@ public class ChessGame {
             board.removePiece(move.getStartPosition());
         }
 
-        //Check if we did EnPassant
-        if (Objects.equals(enPassantDestination, move.getEndPosition()) && board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
-            board.removePiece(enPassantablePawn);
-        }
-
-        //check if next player can EnPassant
-        if ((move.getStartPosition().getRow() == 2) && (move.getEndPosition().getRow() == 4) && (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN)) {
-            enPassantablePawn = move.getEndPosition();
-            enPassantDestination = new ChessPosition(3, enPassantablePawn.getColumn());
-        } else if ((move.getStartPosition().getRow() == 7) && (move.getEndPosition().getRow() == 5) && (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN)) {
-            enPassantablePawn = move.getEndPosition();
-            enPassantDestination = new ChessPosition(6, enPassantablePawn.getColumn());
-        } else {
-            enPassantablePawn = null;
-            enPassantDestination = null;
-        }
-
-
         if (Objects.equals(move.getStartPosition(), new ChessPosition(1, 5))) {
             whiteCanQueenSideCastle = false;
             whiteCanKingSideCastle = false;
@@ -472,15 +340,6 @@ public class ChessGame {
         if (Objects.equals(move.getStartPosition(), new ChessPosition(8, 8))) {
             blackCanKingSideCastle = false;
         }
-
-
-        TeamColor nextPlayer;
-        if (getTeamTurn() == TeamColor.WHITE) {
-            nextPlayer = TeamColor.BLACK;
-        } else {
-            nextPlayer = TeamColor.WHITE;
-        }
-        setTeamTurn(nextPlayer);
     }
 
     /**
@@ -490,7 +349,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return isPositionThreatened(board, findKing(teamColor, board));
+        return ThreatChecker.isPositionThreatened(board, findKing(teamColor, board));
     }
 
     /**

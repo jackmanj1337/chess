@@ -34,13 +34,6 @@ public class GameDAO implements GameDAI {
         return data;
     }
 
-    /*
-    @Override
-    public void deleteGame(int gameID) throws DataAccessException {
-        games.removeIf(game -> gameID == (game.gameID()));
-    }
-     */
-
 
     @Override
     public void deleteAllGames() throws DataAccessException {
