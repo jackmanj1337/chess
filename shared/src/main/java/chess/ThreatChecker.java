@@ -24,7 +24,15 @@ public class ThreatChecker {
                 {-1, -2}
         };
 
-        positionIsThreatened = isPositionDirectlyThreatened(board, position, knightDirections, threateningColor, positionIsThreatened, ChessPiece.PieceType.KNIGHT);
+        positionIsThreatened =
+                isPositionDirectlyThreatened(
+                        board,
+                        position,
+                        knightDirections,
+                        threateningColor,
+                        positionIsThreatened,
+                        ChessPiece.PieceType.KNIGHT
+                );
 
         if (positionIsThreatened) {
             return positionIsThreatened;
@@ -70,7 +78,15 @@ public class ThreatChecker {
                 {0, -1}
         };
 
-        positionIsThreatened = isPositionDirectlyThreatened(board, position, kingDirections, threateningColor, positionIsThreatened, ChessPiece.PieceType.KING);
+        positionIsThreatened =
+                isPositionDirectlyThreatened(
+                        board,
+                        position,
+                        kingDirections,
+                        threateningColor,
+                        positionIsThreatened,
+                        ChessPiece.PieceType.KING
+                );
 
         if (positionIsThreatened) {
             return positionIsThreatened;
@@ -84,7 +100,16 @@ public class ThreatChecker {
                 {0, -1}
         };
 
-        positionIsThreatened = isPositionRemotelyThreatened(board, position, straights, threateningColor, positionIsThreatened, ChessPiece.PieceType.ROOK);
+        positionIsThreatened =
+                isPositionRemotelyThreatened(
+                        board,
+                        position,
+                        straights,
+                        threateningColor,
+                        positionIsThreatened,
+                        ChessPiece.PieceType.ROOK
+                );
+
         if (positionIsThreatened) {
             return positionIsThreatened;
         }
@@ -98,41 +123,69 @@ public class ThreatChecker {
                 {-1, -1}
         };
 
-        positionIsThreatened = isPositionRemotelyThreatened(board, position, diagonals, threateningColor, positionIsThreatened, ChessPiece.PieceType.BISHOP);
+        positionIsThreatened =
+                isPositionRemotelyThreatened(
+                        board,
+                        position,
+                        diagonals,
+                        threateningColor,
+                        positionIsThreatened,
+                        ChessPiece.PieceType.BISHOP
+                );
 
         return positionIsThreatened;
     }
 
-    private static boolean isPositionRemotelyThreatened(ChessBoard board, ChessPosition position, int[][] diagonals, ChessGame.TeamColor threateningColor, boolean positionIsthreatened, ChessPiece.PieceType threateningPieceType) {
-        for (int[] direction : diagonals) {
-            int targetRow = position.getRow();
-            int targetCol = position.getColumn();
-            while (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                targetRow += direction[0];
-                targetCol += direction[1];
-                if (targetRow >= 1 && targetRow <= 8 && targetCol >= 1 && targetCol <= 8) {
-                    ChessPosition threateningPosition = new ChessPosition(targetRow, targetCol);
-                    ChessPiece threateningPiece = board.getPiece(threateningPosition);
-                    if (threateningPiece != null) {
-                        if (Objects.equals(threateningPiece.getTeamColor(), threateningColor)) {
-                            if (Objects.equals(threateningPiece.getPieceType(), threateningPieceType) ||
-                                    Objects.equals(threateningPiece.getPieceType(), ChessPiece.PieceType.QUEEN)) {
-                                positionIsthreatened = true;
-                            } else {
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
+    private static boolean isPositionRemotelyThreatened(
+            ChessBoard board,
+            ChessPosition position,
+            int[][] directions,
+            ChessGame.TeamColor threateningColor,
+            boolean positionIsthreatened,
+            ChessPiece.PieceType threateningPieceType
+    ) {
+        for (int[] direction : directions) {
+            int row = position.getRow();
+            int col = position.getColumn();
 
-                    }
+            while (true) {
+                row += direction[0];
+                col += direction[1];
+                if (!isOnBoard(row, col)) {
+                    break;
+                }
+
+                ChessPosition checkPos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(checkPos);
+
+                if (piece == null) {
+                    continue;
+                }
+
+                if (!Objects.equals(piece.getTeamColor(), threateningColor)) {
+                    break;
+                }
+
+                ChessPiece.PieceType type = piece.getPieceType();
+                if (type == threateningPieceType || type == ChessPiece.PieceType.QUEEN) {
+                    return true;
+                } else {
+                    break;
                 }
             }
         }
-        return positionIsthreatened;
+
+        return false;
     }
 
-    private static boolean isPositionDirectlyThreatened(ChessBoard board, ChessPosition position, int[][] knightDirections, ChessGame.TeamColor threateningColor, boolean positionIsthreatened, ChessPiece.PieceType threateningPieceType) {
+    private static boolean isPositionDirectlyThreatened(
+            ChessBoard board,
+            ChessPosition position,
+            int[][] knightDirections,
+            ChessGame.TeamColor threateningColor,
+            boolean positionIsthreatened,
+            ChessPiece.PieceType threateningPieceType
+    ) {
         for (int[] direction : knightDirections) {
             int targetRow = position.getRow();
             int targetCol = position.getColumn();
@@ -152,4 +205,9 @@ public class ThreatChecker {
         }
         return positionIsthreatened;
     }
+
+    private static boolean isOnBoard(int row, int col) {
+        return (row >= 1 && row <= 8 && col >= 1 && col <= 8);
+    }
 }
+
