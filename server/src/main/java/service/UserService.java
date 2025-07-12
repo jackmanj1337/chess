@@ -1,5 +1,8 @@
 package service;
 
+import dataaccess.DAOManager;
+import dataaccess.dainterface.AuthDAI;
+import dataaccess.dainterface.UserDAI;
 import dataaccess.localstorage.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.localstorage.UserDAO;
@@ -16,7 +19,7 @@ import java.util.UUID;
 
 public class UserService {
     public RegisterResult registerNewUser(RegisterRequest registerRequest) throws DataAccessException {
-        UserDAO userAccess = new UserDAO();
+        UserDAI userAccess = DAOManager.users;
         if (userAccess.getUser(registerRequest.username()) == null) {
             userAccess.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
             LoginResult authdata = login(new LoginRequest(registerRequest.username(), registerRequest.password()));
@@ -27,8 +30,8 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        UserDAO userAccess = new UserDAO();
-        AuthDAO authAccess = new AuthDAO();
+        UserDAI userAccess = DAOManager.users;
+        AuthDAI authAccess = DAOManager.auths;
         UserData loginTarget = userAccess.getUser(loginRequest.username());
         if (loginTarget == null) {
             return new LoginResult(401, "Error: unauthorized", null, null);
@@ -44,7 +47,7 @@ public class UserService {
     }
 
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
-        AuthDAO authAccess = new AuthDAO();
+        AuthDAI authAccess = DAOManager.auths;
         if (authAccess.getAuthFromToken(logoutRequest.authToken()) != null) {
             authAccess.deleteAuth(logoutRequest.authToken());
             return new LogoutResult(200, "all good");
@@ -53,8 +56,8 @@ public class UserService {
     }
 
     public void clearAllUsersAndAuths() throws DataAccessException {
-        UserDAO userAccess = new UserDAO();
-        AuthDAO authAccess = new AuthDAO();
+        UserDAI userAccess = DAOManager.users;
+        AuthDAI authAccess = DAOManager.auths;
         authAccess.deleteAllAuths();
         userAccess.deleteAllUsers();
     }

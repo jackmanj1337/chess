@@ -1,6 +1,9 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DAOManager;
+import dataaccess.dainterface.AuthDAI;
+import dataaccess.dainterface.GameDAI;
 import dataaccess.localstorage.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.localstorage.GameDAO;
@@ -18,14 +21,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService {
     public void clearAllGames() throws DataAccessException {
-        GameDAO gameAccess = new GameDAO();
+        GameDAI gameAccess = DAOManager.games;
         gameAccess.deleteAllGames();
     }
 
     public ListGamesResult listAllGames(String token) throws DataAccessException {
-        AuthDAO authAccess = new AuthDAO();
+        AuthDAI authAccess = DAOManager.auths;
         if (authAccess.getAuthFromToken(token) != null) {
-            GameDAO gamesAccess = new GameDAO();
+            GameDAI gamesAccess = DAOManager.games;
             return new ListGamesResult(200, "all good", gamesAccess.listAllGames());
         } else {
             return new ListGamesResult(401, "Error: unauthorized", new ArrayList<>());
@@ -35,12 +38,12 @@ public class GameService {
     }
 
     public CreateGameResult createNewGame(CreateGameRequest request) throws DataAccessException {
-        AuthDAO authAccess = new AuthDAO();
+        AuthDAI authAccess = DAOManager.auths;
         if (request.authToken() == null || request.gameName() == null) {
             return new CreateGameResult(400, "Error: bad request", null);
         }
         if (authAccess.getAuthFromToken(request.authToken()) != null) {
-            GameDAO gamesAccess = new GameDAO();
+            GameDAI gamesAccess = DAOManager.games;
             int id;
             do {
                 id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
@@ -53,9 +56,9 @@ public class GameService {
     }
 
     public JoinGameResult joinGame(JoinGameRequest request) throws DataAccessException {
-        AuthDAO authAccess = new AuthDAO();
+        AuthDAI authAccess = DAOManager.auths;
         if (authAccess.getAuthFromToken(request.authToken()) != null) {
-            GameDAO gamesAccess = new GameDAO();
+            GameDAI gamesAccess = DAOManager.games;
             GameData oldGame = gamesAccess.getGame(request.gameID());
             if (oldGame == null) {
                 return new JoinGameResult(400, "Error: bad request");
