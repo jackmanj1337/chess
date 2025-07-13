@@ -17,7 +17,7 @@ public class UserHandler {
         RegisterRequest newUserInfo = GSON.fromJson(req.body(), RegisterRequest.class);
         res.type("application/json");
 
-        if (newUserInfo.username() == null || newUserInfo.email() == null || newUserInfo.password() == null) {
+        if (newUserInfo.username() == null || newUserInfo.email() == null || newUserInfo.plainPassword() == null) {
             res.status(400);
             RegisterResult result = new RegisterResult(400, "Error: bad request", null, null);
             return GSON.toJson(result);

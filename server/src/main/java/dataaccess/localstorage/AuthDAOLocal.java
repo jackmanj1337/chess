@@ -6,10 +6,10 @@ import model.AuthData;
 
 import java.util.ArrayList;
 
-public class AuthDAO implements AuthDAI {
+public class AuthDAOLocal implements AuthDAI {
     static ArrayList<AuthData> auths = new ArrayList<>();
 
-    public AuthDAO() {
+    public AuthDAOLocal() {
     }
 
     ;
@@ -29,16 +29,6 @@ public class AuthDAO implements AuthDAI {
         for (AuthData authdata : auths) {
             if (auth.equals(authdata.authToken())) {
                 return authdata;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public AuthData getAuthFromUsername(String username) throws DataAccessException {
-        for (AuthData auth : auths) {
-            if (username.equals(auth.username())) {
-                return auth;
             }
         }
         return null;

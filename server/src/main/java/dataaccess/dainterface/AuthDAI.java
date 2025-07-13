@@ -11,8 +11,6 @@ public interface AuthDAI {
 
     public AuthData getAuthFromToken(String auth) throws DataAccessException;
 
-    public AuthData getAuthFromUsername(String username) throws DataAccessException;
-
     public void deleteAuth(String authkey) throws DataAccessException;
 
     public void deleteAllAuths() throws DataAccessException;

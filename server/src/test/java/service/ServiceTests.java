@@ -1,9 +1,9 @@
 package service;
 
-import dataaccess.localstorage.AuthDAO;
+import dataaccess.localstorage.AuthDAOLocal;
 import dataaccess.DataAccessException;
-import dataaccess.localstorage.GameDAO;
-import dataaccess.localstorage.UserDAO;
+import dataaccess.localstorage.GameDAOLocal;
+import dataaccess.localstorage.UserDAOLocal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.requests.*;
@@ -15,13 +15,13 @@ public class ServiceTests {
     @BeforeEach
     public void setUp() throws DataAccessException {
         // Reset before each test
-        UserDAO users = new UserDAO();
+        UserDAOLocal users = new UserDAOLocal();
         users.deleteAllUsers();
 
-        AuthDAO auths = new AuthDAO();
+        AuthDAOLocal auths = new AuthDAOLocal();
         auths.deleteAllAuths();
 
-        GameDAO games = new GameDAO();
+        GameDAOLocal games = new GameDAOLocal();
         games.deleteAllGames();
     }
 
@@ -70,7 +70,7 @@ public class ServiceTests {
     @Test
     public void loginImaginaryUser() throws DataAccessException {
         UserService userservice = new UserService();
-        LoginResult linResult = userservice.login(new LoginRequest("BadHacker", "definitely a real password"));
+        LoginResult linResult = userservice.login(new LoginRequest("BadHacker", "definitely a real plainPassword"));
         assertEquals(401, linResult.httpCode(), "should have gotten a 401 response");
     }
 

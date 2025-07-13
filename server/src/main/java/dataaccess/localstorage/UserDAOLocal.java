@@ -6,11 +6,11 @@ import model.UserData;
 
 import java.util.ArrayList;
 
-public class UserDAO implements UserDAI {
+public class UserDAOLocal implements UserDAI {
 
     static ArrayList<UserData> users = new ArrayList<>();
 
-    public UserDAO() {
+    public UserDAOLocal() {
     }
 
     ;

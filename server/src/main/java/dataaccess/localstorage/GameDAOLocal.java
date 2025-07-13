@@ -5,9 +5,8 @@ import dataaccess.dainterface.GameDAI;
 import model.GameData;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class GameDAO implements GameDAI {
+public class GameDAOLocal implements GameDAI {
 
     static ArrayList<GameData> games = new ArrayList<>();
 
