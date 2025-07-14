@@ -14,8 +14,8 @@ public class AuthDAOSQL extends SQLDAO implements AuthDAI {
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS auth_data (
-                  username VARCHAR(256) NOT NULL,
-                  authToken VARCHAR(256) NOT NULL,
+                  `username` VARCHAR(256) NOT NULL UNIQUE,
+                  `authToken` VARCHAR(256) NOT NULL,
                   PRIMARY KEY (authToken),
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """

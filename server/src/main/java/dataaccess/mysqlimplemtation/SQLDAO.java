@@ -1,6 +1,7 @@
 package dataaccess.mysqlimplemtation;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 
@@ -10,6 +11,7 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class SQLDAO {
+    protected static final Gson GSON = new Gson();
 
     protected static int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
