@@ -20,9 +20,13 @@ public class UserService {
     public RegisterResult registerNewUser(RegisterRequest registerRequest) throws DataAccessException {
         UserDAI userAccess = DAOManager.users;
         if (userAccess.getUser(registerRequest.username()) == null) {
-
-            userAccess.createUser(new UserData(registerRequest.username(), hashText(registerRequest.password()), registerRequest.email()));
-            LoginResult authdata = login(new LoginRequest(registerRequest.username(), registerRequest.password()));
+            userAccess.createUser(
+                    new UserData(registerRequest.username(),
+                            hashText(registerRequest.password()),
+                            registerRequest.email()));
+            LoginResult authdata = login(new LoginRequest(
+                    registerRequest.username(),
+                    registerRequest.password()));
             return new RegisterResult(authdata.httpCode(), authdata.message(), authdata.username(), authdata.authToken());
         } else {
             return new RegisterResult(403, "Error: already taken", null, null);
