@@ -36,7 +36,7 @@ public class UserService {
         if (loginTarget == null) {
             return new LoginResult(401, "Error: unauthorized", null, null);
         }
-        if (hashText(loginRequest.password()).equals(loginTarget.password())) {
+        if (BCrypt.checkpw(loginRequest.password(), loginTarget.password())) {
             String token;
             token = UUID.randomUUID().toString();
             authAccess.addAuth(new AuthData(token, loginRequest.username()));
