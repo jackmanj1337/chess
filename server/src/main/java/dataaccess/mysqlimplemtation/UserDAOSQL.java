@@ -12,10 +12,10 @@ public class UserDAOSQL extends SQLDAO implements UserDAI {
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS user_data (
-                  `username` VARCHAR(256) NOT NULL  UNIQUE,
+                  `username` VARCHAR(256) NOT NULL UNIQUE,
                   `passwordHash` VARCHAR(256) NOT NULL,
                   `email` VARCHAR(256) NOT NULL,
-                  PRIMARY KEY (username),
+                  PRIMARY KEY (username)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
         };

@@ -16,12 +16,12 @@ public class GameDAOSQL extends SQLDAO implements GameDAI {
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS game_data (
-            `gameID` int NOT NULL UNIQUE,
-            `whiteName` varchar(256) DEFAULT NULL,
-            `blackName` varchar(256) DEFAULT NULL,
-            `gameName` varchar(256) NOT NULL,
-            `game` TEXT NOT NULL,
-            PRIMARY KEY (`gameID`)
+                gameID INT NOT NULL AUTO_INCREMENT,
+                whiteName VARCHAR(256) DEFAULT NULL,
+                blackName VARCHAR(256) DEFAULT NULL,
+                gameName VARCHAR(256) NOT NULL,
+                game TEXT NOT NULL,
+                PRIMARY KEY (gameID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
         };
@@ -30,15 +30,15 @@ public class GameDAOSQL extends SQLDAO implements GameDAI {
 
     @Override
     public GameData addNewGame(GameData data) throws DataAccessException {
-        String sql = "INSERT INTO game_data (gameID, whiteName, blackName, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        executeUpdate(sql,
-                data.gameID(),
+        String sql = "INSERT INTO game_data (whiteName, blackName, gameName, game) VALUES (?, ?, ?, ?)";
+        int id = executeUpdate(sql,
                 data.whiteUsername(),
                 data.blackUsername(),
                 data.gameName(),
                 GSON.toJson(data.game()));
-        return data;
+        return new GameData(id, data.whiteUsername(), data.blackUsername(), data.gameName(), data.game());
     }
+
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {

@@ -1,5 +1,9 @@
 package service;
 
+import dataaccess.DAOManager;
+import dataaccess.dainterface.AuthDAI;
+import dataaccess.dainterface.GameDAI;
+import dataaccess.dainterface.UserDAI;
 import dataaccess.localstorage.AuthDAOLocal;
 import dataaccess.DataAccessException;
 import dataaccess.localstorage.GameDAOLocal;
@@ -15,13 +19,13 @@ public class ServiceTests {
     @BeforeEach
     public void setUp() throws DataAccessException {
         // Reset before each test
-        UserDAOLocal users = new UserDAOLocal();
+        UserDAI users = DAOManager.users;
         users.deleteAllUsers();
 
-        AuthDAOLocal auths = new AuthDAOLocal();
+        AuthDAI auths = DAOManager.auths;
         auths.deleteAllAuths();
 
-        GameDAOLocal games = new GameDAOLocal();
+        GameDAI games = DAOManager.games;
         games.deleteAllGames();
     }
 

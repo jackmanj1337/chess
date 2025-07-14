@@ -42,12 +42,8 @@ public class GameService {
         }
         if (authAccess.getAuthFromToken(request.authToken()) != null) {
             GameDAI gamesAccess = DAOManager.games;
-            int id;
-            do {
-                id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
-            } while (gamesAccess.getGame(id) != null);
-            gamesAccess.addNewGame(new GameData(id, null, null, request.gameName(), new ChessGame()));
-            return new CreateGameResult(200, "all good", id);
+            GameData game = gamesAccess.addNewGame(new GameData(0, null, null, request.gameName(), new ChessGame()));
+            return new CreateGameResult(200, "all good", game.gameID());
         } else {
             return new CreateGameResult(401, "Error: unauthorized", null);
         }
