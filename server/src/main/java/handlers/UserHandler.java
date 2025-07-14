@@ -17,14 +17,19 @@ public class UserHandler {
         RegisterRequest newUserInfo = GSON.fromJson(req.body(), RegisterRequest.class);
         res.type("application/json");
 
-        if (newUserInfo.username() == null || newUserInfo.email() == null || newUserInfo.password() == null) {
-            res.status(400);
-            RegisterResult result = new RegisterResult(400, "Error: bad request", null, null);
-            return GSON.toJson(result);
-        } else {
-            RegisterResult result = USER_SERVICE.registerNewUser(newUserInfo);
-            res.status(result.httpCode());
-            return GSON.toJson(result);
+        try {
+            if (newUserInfo.username() == null || newUserInfo.email() == null || newUserInfo.password() == null) {
+                res.status(400);
+                RegisterResult result = new RegisterResult(400, "Error: bad request", null, null);
+                return GSON.toJson(result);
+            } else {
+                RegisterResult result = USER_SERVICE.registerNewUser(newUserInfo);
+                res.status(result.httpCode());
+                return GSON.toJson(result);
+            }
+        } catch (DataAccessException e) {
+            res.status(500);
+            return GSON.toJson(new ErrorResult("Error: " + e.getMessage()));
         }
     }
 
@@ -33,15 +38,20 @@ public class UserHandler {
         LoginRequest loginInfo = GSON.fromJson(req.body(), LoginRequest.class);
         res.type("application/json");
 
-        if (loginInfo.username() == null || loginInfo.username().isEmpty() ||
-                loginInfo.password() == null || loginInfo.password().isEmpty()) {
-            res.status(400);
-            LoginResult result = new LoginResult(400, "Error: bad request", null, null);
-            return GSON.toJson(result);
-        } else {
-            LoginResult result = USER_SERVICE.login(loginInfo);
-            res.status(result.httpCode());
-            return GSON.toJson(result);
+        try {
+            if (loginInfo.username() == null || loginInfo.username().isEmpty() ||
+                    loginInfo.password() == null || loginInfo.password().isEmpty()) {
+                res.status(400);
+                LoginResult result = new LoginResult(400, "Error: bad request", null, null);
+                return GSON.toJson(result);
+            } else {
+                LoginResult result = USER_SERVICE.login(loginInfo);
+                res.status(result.httpCode());
+                return GSON.toJson(result);
+            }
+        } catch (DataAccessException e) {
+            res.status(500);
+            return GSON.toJson(new ErrorResult("Error: " + e.getMessage()));
         }
 
 
@@ -52,15 +62,18 @@ public class UserHandler {
         LogoutRequest logoutInfo = new LogoutRequest(req.headers("Authorization"));
         res.type("application/json");
 
-        if (logoutInfo.authToken().isEmpty()) {
-            res.status(400);
-        } else {
-            LogoutResult result = USER_SERVICE.logout(logoutInfo);
-            res.status(result.httpCode());
-            return GSON.toJson(result);
+        try {
+            if (logoutInfo.authToken().isEmpty()) {
+                res.status(400);
+                return "called successfully";
+            } else {
+                LogoutResult result = USER_SERVICE.logout(logoutInfo);
+                res.status(result.httpCode());
+                return GSON.toJson(result);
+            }
+        } catch (DataAccessException e) {
+            res.status(500);
+            return GSON.toJson(new ErrorResult("Error: " + e.getMessage()));
         }
-
-
-        return "called successfully";
     }
 }
