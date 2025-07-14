@@ -6,6 +6,7 @@ import dataaccess.dainterface.UserDAI;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.results.LoginResult;
 import service.results.LogoutResult;
 import service.results.RegisterResult;
@@ -19,7 +20,8 @@ public class UserService {
     public RegisterResult registerNewUser(RegisterRequest registerRequest) throws DataAccessException {
         UserDAI userAccess = DAOManager.users;
         if (userAccess.getUser(registerRequest.username()) == null) {
-            userAccess.createUser(new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email()));
+
+            userAccess.createUser(new UserData(registerRequest.username(), hashText(registerRequest.password()), registerRequest.email()));
             LoginResult authdata = login(new LoginRequest(registerRequest.username(), registerRequest.password()));
             return new RegisterResult(authdata.httpCode(), authdata.message(), authdata.username(), authdata.authToken());
         } else {
@@ -34,7 +36,7 @@ public class UserService {
         if (loginTarget == null) {
             return new LoginResult(401, "Error: unauthorized", null, null);
         }
-        if (loginRequest.password().equals(loginTarget.password())) {
+        if (hashText(loginRequest.password()).equals(loginTarget.password())) {
             String token;
             token = UUID.randomUUID().toString();
             authAccess.addAuth(new AuthData(token, loginRequest.username()));
@@ -58,5 +60,9 @@ public class UserService {
         AuthDAI authAccess = DAOManager.auths;
         authAccess.deleteAllAuths();
         userAccess.deleteAllUsers();
+    }
+
+    private String hashText(String plainText) {
+        return BCrypt.hashpw(plainText, BCrypt.gensalt());
     }
 }
