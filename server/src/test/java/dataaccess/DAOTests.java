@@ -1,8 +1,6 @@
-package dao;
+package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.DAOManager;
-import dataaccess.DataAccessException;
 import dataaccess.dainterface.AuthDAI;
 import dataaccess.dainterface.GameDAI;
 import dataaccess.dainterface.UserDAI;
