@@ -1,4 +1,4 @@
-package DAO;
+package dao;
 
 import chess.ChessGame;
 import dataaccess.DAOManager;
@@ -11,8 +11,6 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import javax.xml.crypto.Data;
 
 import java.util.ArrayList;
 
@@ -109,11 +107,11 @@ public class DAOTests {
 
     @Test
     void deleteAllAuthsTest() throws DataAccessException {
-        var Auth1 = auths.addAuth(new AuthData("dummyToken", "doug"));
-        var Auth2 = auths.addAuth(new AuthData("testToken", "john"));
+        var auth1 = auths.addAuth(new AuthData("dummyToken", "doug"));
+        var auth2 = auths.addAuth(new AuthData("testToken", "john"));
         auths.deleteAllAuths();
-        assertNull(auths.getAuthFromToken(Auth1.authToken()));
-        assertNull(auths.getAuthFromToken(Auth2.authToken()));
+        assertNull(auths.getAuthFromToken(auth1.authToken()));
+        assertNull(auths.getAuthFromToken(auth2.authToken()));
     }
 
     // GameDao Tests
