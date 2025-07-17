@@ -28,6 +28,7 @@ public class SQLDAO {
                         ps.setNull(i + 1, NULL);
                     }
                 }
+
                 ps.executeUpdate();
 
                 var rs = ps.getGeneratedKeys();
