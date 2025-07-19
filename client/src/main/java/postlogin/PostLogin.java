@@ -159,11 +159,15 @@ public class PostLogin {
 
 
     private CreateGameResult createGameMenu(CreateGameRequest createGameRequest) {
-        return null;
+        if (!createGameRequest.gameName().matches("[a-zA-Z0-9_]+") || createGameRequest.gameName().length() > UserInputConstraints.MAX_GAMENAME_LENGTH) {
+            return new CreateGameResult(400, "Error: illegal game name", null);
+        }
+
+        return server.createGame(createGameRequest);
     }
 
     private JoinGameResult joinGameMenu(JoinGameRequest joinGameRequest) {
-        return null;
+        return server.joinGame(joinGameRequest);
     }
 
     private void listMenu() {
