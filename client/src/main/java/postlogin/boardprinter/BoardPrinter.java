@@ -12,7 +12,7 @@ import static postlogin.boardprinter.BoardSquare.*;
 public class BoardPrinter {
 
 
-    public void print(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition) {
+    public static void print(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition) {
         BoardSquare[][] board = getFullBoard(game);
 
         if (selectedPosition != null) {
@@ -42,7 +42,7 @@ public class BoardPrinter {
 
     }
 
-    private BoardSquare[][] getFullBoard(ChessGame game) {
+    private static BoardSquare[][] getFullBoard(ChessGame game) {
         BoardSquare[][] board = generateEmptyLabeledBoard();
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {

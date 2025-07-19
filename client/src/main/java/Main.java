@@ -1,7 +1,9 @@
 import chess.*;
 import model.GameData;
+import postlogin.PostLogin;
 import prelogin.PreLogin;
 import serverfacade.ServerFacade;
+import serverfacade.results.LoginResult;
 
 import java.util.ArrayList;
 
@@ -25,8 +27,8 @@ public class Main {
         ServerFacade server = new ServerFacade("http://localhost:8080");
         PreLogin preLogin = new PreLogin(server);
         while (true) {
-            System.out.println(preLogin.ui());
-
+            PostLogin postLogin = new PostLogin(server, preLogin.ui());
+            postLogin.ui();
         }
     }
 }

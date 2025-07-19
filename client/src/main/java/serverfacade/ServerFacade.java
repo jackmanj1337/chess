@@ -101,7 +101,7 @@ public class ServerFacade {
         }
     }
 
-    public LogoutResult logout(String token) {
+    public LogoutResult logout(LogoutRequest req) {
         return null;
     }
 
@@ -109,15 +109,15 @@ public class ServerFacade {
         return null;
     }
 
-    public CreateGameResult createGame() {
+    public CreateGameResult createGame(CreateGameRequest req) {
         return null;
     }
 
-    public ListGamesResult listGames() {
+    public ListGamesResult listGames(ListGamesRequest req) {
         return null;
     }
 
-    public JoinGameResult joinGame() {
+    public JoinGameResult joinGame(JoinGameRequest req) {
         return null;
     }
 }
