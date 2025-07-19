@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 import serverfacade.results.*;
 import serverfacade.requests.*;
+import utilities.UserInputConstraints;
 
 public class PostLogin {
     ServerFacade server;
@@ -39,7 +40,7 @@ public class PostLogin {
 
                 switch (split[0].toLowerCase()) {
                     case "create":
-                        if (split.length == 2) {
+                        if ((split.length == 2) && (split[1].length() <= UserInputConstraints.MAX_GAMENAME_LENGTH)) {
                             CreateGameResult result = createGameMenu(new CreateGameRequest(activeAuthToken, split[1]));
                             switch (Objects.requireNonNull(result).httpCode()) {
                                 case 200:
@@ -123,7 +124,7 @@ public class PostLogin {
                     case "observe":
                         if (split.length == 2) {
                             GameData game = getGameFromList(split[1]);
-                            enterGame(game);
+                            enterGame(Objects.requireNonNull(game));
                         }
                         break;
                     case "logout":
@@ -166,6 +167,36 @@ public class PostLogin {
     }
 
     private void listMenu() {
+        updateGameList();
+
+        if (activeGames.isEmpty()) {
+            System.out.print("There are no active games\nYou can create one with ");
+            System.out.print(SET_TEXT_BRIGHT_BLUE + "create <GAME_NAME>" + RESET_TEXT_COLOR + "\n");
+            return;
+        }
+
+
+        String header = String.format("║  %-5s ║ %-30s ║ %-30s ║ %-30s ║", "ID", "Game Name", "White Player", "Black Player");
+        String topBorder = "╔════════╦════════════════════════════════╦════════════════════════════════╦════════════════════════════════╗";
+        String midBorder = "╠════════╬════════════════════════════════╬════════════════════════════════╬════════════════════════════════╣";
+        String bottomBorder = "╚════════╩════════════════════════════════╩════════════════════════════════╩════════════════════════════════╝";
+
+        System.out.println(topBorder);
+        System.out.println(header);
+        System.out.println(midBorder);
+
+        for (int i = 0; i < activeGames.size(); i++) {
+            String white = activeGames.get(i).whiteUsername() != null ? activeGames.get(i).whiteUsername() : "(open)";
+            String black = activeGames.get(i).blackUsername() != null ? activeGames.get(i).blackUsername() : "(open)";
+            String row = String.format("║  %-5d ║ %-30s ║ %-30s ║ %-30s ║",
+                    i + 1,
+                    activeGames.get(i).gameName(),
+                    white,
+                    black);
+            System.out.println(row);
+        }
+
+        System.out.println(bottomBorder);
     }
 
 
@@ -195,6 +226,7 @@ public class PostLogin {
         System.out.print(SET_TEXT_BRIGHT_BLUE + "create <GAME_NAME>" + RESET_TEXT_COLOR);
         System.out.print(" -> to create a new game\n");
         System.out.print("Note: Game name must only be alphanumeric or an \"_\" character\n");
+        System.out.print("Game name must be " + UserInputConstraints.MAX_GAMENAME_LENGTH + " characters or less.\n");
 
         System.out.print(SET_TEXT_BRIGHT_BLUE + "list" + RESET_TEXT_COLOR);
         System.out.print(" -> lists all active games\n");

@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 import serverfacade.results.*;
 import serverfacade.requests.*;
+import utilities.UserInputConstraints;
 
 public class PreLogin {
     ServerFacade server;
@@ -67,7 +68,7 @@ public class PreLogin {
                     }
                     break;
                 case "register":
-                    if (split.length == 4) {
+                    if (split.length == 4 && (split[1].length() <= UserInputConstraints.MAX_USERNAME_LENGTH)) {
                         RegisterResult result = registerMenu(new RegisterRequest(split[1], split[2], split[3]));
                         switch (Objects.requireNonNull(result).httpCode()) {
                             case 200:
@@ -131,7 +132,8 @@ public class PreLogin {
     private void printHelpMenu() {
         System.out.print(SET_TEXT_BRIGHT_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR);
         System.out.print(" -> to create a new account\n");
-        System.out.print("Note: Username and password must only be alphanumeric or an \"_\" character\n");
+        System.out.print("Note: Username and password must only be alphanumeric or an \"_\" character.\n");
+        System.out.print("Username must be " + UserInputConstraints.MAX_USERNAME_LENGTH + " characters or less.\n");
 
         System.out.print(SET_TEXT_BRIGHT_BLUE + "login <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR);
         System.out.print(" -> login to an existing account\n");
