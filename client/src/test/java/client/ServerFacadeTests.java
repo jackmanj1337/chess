@@ -25,10 +25,9 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        int portNum = 8080;
-        var port = server.run(portNum);
+        var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade("http://localhost:" + portNum);
+        facade = new ServerFacade("http://localhost:" + port);
     }
 
     @BeforeEach
