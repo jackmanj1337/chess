@@ -79,5 +79,19 @@ public class ServerFacadeTests {
         assertEquals(400, result.httpCode());
     }
 
+    @Test
+    public void LoginTest() {
+        facade.register(new RegisterRequest("doug", "password", "doug@testing.com"));
+        LoginResult result = facade.login(new LoginRequest("doug", "password"));
+        assertEquals(200, result.httpCode());
+    }
+
+    @Test
+    public void LoginBadPasswordTest() {
+        facade.register(new RegisterRequest("doug", "password", "doug@testing.com"));
+        LoginResult result = facade.login(new LoginRequest("doug", "passeord"));
+        assertEquals(401, result.httpCode());
+    }
+
 
 }
