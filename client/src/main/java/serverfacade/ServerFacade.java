@@ -51,9 +51,8 @@ public class ServerFacade {
 
     public LogoutResult logout(LogoutRequest req) {
         try {
-            String body = json.toJson(req);
 
-            StringBuilder response = requestMaker("/session", "DELETE", req.authToken(), body);
+            StringBuilder response = requestMaker("/session", "DELETE", req.authToken(), null);
 
             return json.fromJson(response.toString(), LogoutResult.class);
         } catch (IOException e) {
@@ -75,9 +74,8 @@ public class ServerFacade {
 
     public ListGamesResult listGames(ListGamesRequest req) {
         try {
-            String body = json.toJson(req);
 
-            StringBuilder response = requestMaker("/game", "GET", req.authToken(), body);
+            StringBuilder response = requestMaker("/game", "GET", req.authToken(), null);
 
             return json.fromJson(response.toString(), ListGamesResult.class);
 
