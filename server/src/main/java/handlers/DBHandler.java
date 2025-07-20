@@ -6,6 +6,7 @@ import service.UserService;
 import service.results.ErrorResult;
 import spark.*;
 import com.google.gson.Gson;
+import service.results.ClearDBResult;
 
 public class DBHandler {
     private static final Gson GSON = new Gson();
@@ -20,7 +21,7 @@ public class DBHandler {
             UserService users = new UserService();
             users.clearAllUsersAndAuths();
             res.status(200);
-            return GSON.toJson(null);
+            return GSON.toJson(new ClearDBResult(200, "all good"));
         } catch (DataAccessException e) {
             res.status(500);
             return GSON.toJson(new ErrorResult("Error: " + e.getMessage()));

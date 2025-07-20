@@ -112,5 +112,10 @@ public class ServerFacadeTests {
         assertEquals(403, jGResult.httpCode());
     }
 
+    @Test
+    public void clearDBTest() {
+        assertEquals(200, facade.clearDB().httpCode());
+    }
+
 
 }

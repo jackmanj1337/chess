@@ -84,6 +84,17 @@ public class ServerFacade {
         }
     }
 
+    public ClearDBResult clearDB() {
+        try {
+            StringBuilder response = requestMaker("/db", "DELETE", null, null);
+
+            return json.fromJson(response.toString(), ClearDBResult.class);
+
+        } catch (IOException e) {
+            return new ClearDBResult(500, "Error: " + e.getMessage());
+        }
+    }
+
     public JoinGameResult joinGame(JoinGameRequest req) {
         try {
             String body = json.toJson(req);

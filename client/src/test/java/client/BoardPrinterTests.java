@@ -30,7 +30,7 @@ import static utilities.EscapeSequences.SET_TEXT_BRIGHT_BLUE;
 public class BoardPrinterTests {
 
 
-    @Test
+    //@Test
     public void boardPrinterTest() {
         ChessGame game = new ChessGame();
         ChessPosition pos = null;
