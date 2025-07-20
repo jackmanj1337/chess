@@ -8,10 +8,8 @@ import dataaccess.dainterface.UserDAI;
 import org.junit.jupiter.api.*;
 import server.Server;
 import serverfacade.ServerFacade;
-import serverfacade.requests.LoginRequest;
-import serverfacade.requests.RegisterRequest;
-import serverfacade.results.LoginResult;
-import serverfacade.results.RegisterResult;
+import serverfacade.requests.*;
+import serverfacade.results.*;
 
 
 public class ServerFacadeTests {
@@ -55,9 +53,14 @@ public class ServerFacadeTests {
         System.out.println(result.toString());
 
         System.out.println("\n\ncalling facade login");
-        LoginResult lresult = facade.login(new LoginRequest("doug", "password"));
+        LoginResult linresult = facade.login(new LoginRequest("doug", "password"));
         System.out.println("returned results");
-        System.out.println(lresult.toString());
+        System.out.println(linresult.toString());
+
+        System.out.println("\n\ncalling facade logout");
+        LogoutResult loutresult = facade.logout(new LogoutRequest(linresult.authToken()));
+        System.out.println("returned results");
+        System.out.println(loutresult.toString());
 
         Assertions.assertTrue(true);
     }

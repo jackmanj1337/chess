@@ -102,11 +102,43 @@ public class ServerFacade {
     }
 
     public LogoutResult logout(LogoutRequest req) {
-        return null;
-    }
+        try {
+            URL url = new URL(urlBase + "/session");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-    public ClearDBResult clearDB() {
-        return null;
+            connection.setRequestMethod("DELETE");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Authorization", req.authToken());
+
+            String body = json.toJson(req);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = body.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int status = connection.getResponseCode();
+            System.out.println("Status Code: " + status);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+
+            in.close();
+            connection.disconnect();
+
+            System.out.println(response);
+
+            return json.fromJson(response.toString(), LogoutResult.class);
+
+        } catch (IOException e) {
+            return new LogoutResult(500, "Error: " + e.getMessage());
+        }
     }
 
     public CreateGameResult createGame(CreateGameRequest req) {
