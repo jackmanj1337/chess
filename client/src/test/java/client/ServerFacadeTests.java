@@ -117,5 +117,18 @@ public class ServerFacadeTests {
         assertEquals(200, facade.clearDB().httpCode());
     }
 
+    @Test
+    public void logoutTest() {
+        RegisterResult regResult = facade.register(new RegisterRequest("doug", "password", "doug@testing.com"));
+        LogoutResult loutResult = facade.logout(new LogoutRequest(regResult.authToken()));
+        assertEquals(200, loutResult.httpCode());
+    }
+
+    @Test
+    public void logoutImaginaryUserTest() {
+        LogoutResult loutResult = facade.logout(new LogoutRequest("badToken"));
+        assertEquals(401, loutResult.httpCode());
+    }
+
 
 }
