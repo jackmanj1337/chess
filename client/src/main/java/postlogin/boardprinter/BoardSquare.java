@@ -74,7 +74,7 @@ public class BoardSquare {
                     (BOARDER_COLOR, LABEL_COLOR + rowLabels[row]);
 
             for (int col = 0; col < 8; col++) {
-                String squareColor = (row + col) % 2 == 0 ? BOARD_LIGHT_COLOR : BOARD_DARK_COLOR;
+                String squareColor = (row + col) % 2 == 0 ? BOARD_DARK_COLOR : BOARD_LIGHT_COLOR;
                 board[row + 1][col + 1] = new BoardSquare(squareColor);
             }
 
@@ -90,7 +90,7 @@ public class BoardSquare {
                     (BOARDER_COLOR, LABEL_COLOR + colLabels[col]);
         }
         board[9][9] = new BoardSquare(BOARDER_COLOR, EMPTY);
-        
+
         return board;
     }
 

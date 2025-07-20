@@ -24,11 +24,11 @@ public class Main {
                         """
         );
 
+
         ServerFacade server = new ServerFacade("http://localhost:8080");
         PreLogin preLogin = new PreLogin(server);
         while (true) {
-            PostLogin postLogin = new PostLogin(server, preLogin.ui());
-            postLogin.ui();
+            preLogin.ui();
         }
     }
 }

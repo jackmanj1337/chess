@@ -20,60 +20,69 @@ public class PostLogin {
     String activeAuthToken;
     String username;
     ArrayList<GameData> activeGames = new ArrayList<>();
+    Scanner scanner;
 
-    public PostLogin(ServerFacade server, LoginResult userData) {
+    public PostLogin(ServerFacade server, Scanner scanner) {
         this.server = server;
-        activeAuthToken = userData.authToken();
-        username = userData.username();
+        this.scanner = scanner;
     }
 
 
-    public void ui() {
-        try (Scanner scanner = new Scanner(System.in);) {
-            while (true) {
+    public void ui(LoginResult userData) {
+        activeAuthToken = userData.authToken();
+        username = userData.username();
+        updateGameList();
+        while (true) {
+            System.out.print("[" + username + "] >>> ");
 
-
-                System.out.print("[" + username + "] >>> ");
-                String input = scanner.nextLine().trim();
-
-                String[] split = input.split("\\s+");
-
-                switch (split[0].toLowerCase()) {
-                    case "create":
-                        creeateGameMenu(split);
-                        break;
-                    case "list":
-                        listMenu();
-                        break;
-                    case "join":
-                        joinGameMenu(split);
-                        break;
-                    case "observe":
-                        if (split.length == 2) {
-                            GameData game = getGameFromList(split[1]);
-                            enterGame(Objects.requireNonNull(game));
-                        }
-                        break;
-                    case "logout":
-                        server.logout(new LogoutRequest(activeAuthToken));
-                        activeAuthToken = null;
-                        return;
-                    case "quit":
-                        server.logout(new LogoutRequest(activeAuthToken));
-                        activeAuthToken = null;
-                        System.out.println("I hope you enjoyed my game!");
-                        System.exit(0);
-                    case "help":
-                        printHelpMenu();
-                        break;
-                    default:
-                        badInputResponse();
-                }
-
-                System.out.println(); // spacing
+            if (!scanner.hasNextLine()) {
+                System.out.println("Input stream closed. Exiting...");
+                server.logout(new LogoutRequest(activeAuthToken));
+                break;
             }
-        }
 
+            String input = scanner.nextLine().trim();
+
+            String[] split = input.split("\\s+");
+
+            switch (split[0].toLowerCase()) {
+                case "create":
+                    createGameMenu(split);
+                    break;
+                case "list":
+                    listMenu();
+                    break;
+                case "join":
+                    joinGameMenu(split);
+                    break;
+                case "observe":
+                    if (split.length == 2) {
+                        GameData game = getGameFromList(split[1]);
+                        if (game != null) {
+                            enterGame(Objects.requireNonNull(game), false);
+                        } else {
+                            System.out.print("Sorry, I cant find that game\n");
+                        }
+                    }
+                    break;
+                case "logout":
+                    server.logout(new LogoutRequest(activeAuthToken));
+                    activeAuthToken = null;
+                    return;
+                case "quit":
+                    server.logout(new LogoutRequest(activeAuthToken));
+                    activeAuthToken = null;
+                    System.out.println("I hope you enjoyed my game!");
+                    System.exit(0);
+                case "help":
+                    printHelpMenu();
+                    break;
+                default:
+                    badInputResponse();
+            }
+
+            System.out.println(); // spacing
+        }
     }
 
     private void joinGameMenu(String[] split) {
@@ -91,11 +100,17 @@ public class PostLogin {
                 return;
             }
 
+            GameData game = getGameFromList(split[1]);
+            if (game == null) {
+                System.out.print("Sorry, I can't find that game.\n");
+                return;
+            }
+
             JoinGameResult result = joinGameProcess(new JoinGameRequest
-                    (activeAuthToken, color.name(), Objects.requireNonNull(getGameFromList(split[1])).gameID()));
+                    (activeAuthToken, color.name(), game.gameID()));
             switch (Objects.requireNonNull(result).httpCode()) {
                 case 200:
-                    enterGame(Objects.requireNonNull(getGameFromList(split[1])));
+                    enterGame(Objects.requireNonNull(getGameFromList(split[1])), color.name().equals("BLACK"));
                     break;
                 case 400:
                     System.out.print("There was a problem with your request.\n");
@@ -118,48 +133,61 @@ public class PostLogin {
         }
     }
 
-    private void creeateGameMenu(String[] split) {
-        if ((split.length == 2) && (split[1].length() <= UserInputConstraints.MAX_GAMENAME_LENGTH)) {
+    private void createGameMenu(String[] split) {
+        if (split.length == 2 && split[1].length() <= UserInputConstraints.MAX_GAMENAME_LENGTH) {
             CreateGameResult result = createGameProcess(new CreateGameRequest(activeAuthToken, split[1]));
-            switch (Objects.requireNonNull(result).httpCode()) {
+
+            if (result == null) {
+                System.out.print("Something went wrong creating the game. No result was returned.\n");
+                return;
+            }
+
+            switch (result.httpCode()) {
                 case 200:
                     updateGameList();
-                    int index = -1;
-                    for (int i = 1; i >= activeGames.size(); i++) {
-                        if (Objects.requireNonNull(getGameFromList(String.valueOf(i))).gameID() == result.gameID()) {
-                            index = i;
+                    boolean found = false;
+                    for (int i = 0; i < activeGames.size(); i++) {
+                        var game = activeGames.get(i);
+                        if (game != null && game.gameID() == result.gameID()) {
+                            found = true;
+                            System.out.print("Your game has been created and currently assigned the ID ");
+                            System.out.print(SET_TEXT_BRIGHT_BLUE + (i + 1) + RESET_TEXT_COLOR + "\n");
+                            break;
                         }
                     }
-                    if (index == -1) {
-                        System.out.print("something went wrong with our database connection,");
+                    if (!found) {
+                        System.out.print("Something went wrong with our database connection, ");
                         System.out.print("but your game may still have been made.\n");
-                        System.out.print("try calling " + SET_TEXT_BRIGHT_BLUE + "list" + RESET_TEXT_COLOR + "to check\n");
-                    } else {
-                        System.out.print("Your game has been created and currently assigned the ID ");
-                        System.out.print(SET_TEXT_BRIGHT_BLUE + index + RESET_TEXT_COLOR + "\n");
+                        System.out.print("Try calling " + SET_TEXT_BRIGHT_BLUE + "list" + RESET_TEXT_COLOR + " to check.\n");
                     }
                     break;
+
                 case 400:
                     System.out.print("There was a problem with your request.\n");
-                    System.out.print("Note: Game name must only be alphanumeric or an \"_\" character\n");
+                    System.out.print("Note: Game name must only be alphanumeric or an \"_\" character.\n");
                     break;
+
                 case 401:
                     System.out.print("Sorry, but you don't seem to be authorized.\n");
-                    System.out.print("Try loging out and logging in again.\n");
+                    System.out.print("Try logging out and logging in again.\n");
+                    break;
+
                 case 500:
                     System.out.print("Sorry, but there appears to have been a problem with our database.\n");
                     break;
+
                 default:
-                    System.out.print("Something went wrong with your request\n");
-                    System.out.print("Please try again shortly\n");
+                    System.out.print("Something went wrong with your request.\n");
+                    System.out.print("Please try again shortly.\n");
             }
         } else {
             badInputResponse();
         }
     }
 
-    private void enterGame(GameData gameData) {
-        if (username.equals(gameData.blackUsername())) {
+
+    private void enterGame(GameData gameData, boolean asBlack) {
+        if (asBlack) {
             BoardPrinter.print(gameData.game(), ChessGame.TeamColor.BLACK, null);
         } else {
             BoardPrinter.print(gameData.game(), ChessGame.TeamColor.WHITE, null);
@@ -225,9 +253,10 @@ public class PostLogin {
                         " for help");
     }
 
+
     private GameData getGameFromList(String listNum) {
         int num = Integer.parseInt(listNum);
-        if (num < 0 || num >= activeGames.size()) {
+        if (num < 1 || num > activeGames.size()) {
             return null;
         }
         return activeGames.get(num - 1);
