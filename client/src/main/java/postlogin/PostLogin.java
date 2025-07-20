@@ -40,86 +40,13 @@ public class PostLogin {
 
                 switch (split[0].toLowerCase()) {
                     case "create":
-                        if ((split.length == 2) && (split[1].length() <= UserInputConstraints.MAX_GAMENAME_LENGTH)) {
-                            CreateGameResult result = createGameMenu(new CreateGameRequest(activeAuthToken, split[1]));
-                            switch (Objects.requireNonNull(result).httpCode()) {
-                                case 200:
-                                    updateGameList();
-                                    int index = -1;
-                                    for (int i = 1; i >= activeGames.size(); i++) {
-                                        if (Objects.requireNonNull(getGameFromList(String.valueOf(i))).gameID() == result.gameID()) {
-                                            index = i;
-                                        }
-                                    }
-                                    if (index == -1) {
-                                        System.out.print("something went wrong with our database connection,");
-                                        System.out.print("but your game may still have been made.\n");
-                                        System.out.print("try calling " + SET_TEXT_BRIGHT_BLUE + "list" + RESET_TEXT_COLOR + "to check\n");
-                                    } else {
-                                        System.out.print("Your game has been created and currently assigned the ID ");
-                                        System.out.print(SET_TEXT_BRIGHT_BLUE + index + RESET_TEXT_COLOR + "\n");
-                                    }
-                                    break;
-                                case 400:
-                                    System.out.print("There was a problem with your request.\n");
-                                    System.out.print("Note: Game name must only be alphanumeric or an \"_\" character\n");
-                                    break;
-                                case 401:
-                                    System.out.print("Sorry, but you don't seem to be authorized.\n");
-                                    System.out.print("Try loging out and logging in again.\n");
-                                case 500:
-                                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
-                                    break;
-                                default:
-                                    System.out.print("Something went wrong with your request\n");
-                                    System.out.print("Please try again shortly\n");
-                            }
-                        } else {
-                            badInputResponse();
-                        }
+                        creeateGameMenu(split);
                         break;
                     case "list":
                         listMenu();
                         break;
                     case "join":
-                        if (split.length == 3) {
-                            ChessGame.TeamColor color;
-                            if (split[2].equalsIgnoreCase("white")) {
-                                color = ChessGame.TeamColor.WHITE;
-                            } else if (split[2].equalsIgnoreCase("black")) {
-                                color = ChessGame.TeamColor.BLACK;
-                            } else {
-                                System.out.print("Sorry, I can't tell which team you are trying to join\n");
-                                System.out.print("You can only join as ");
-                                System.out.print(SET_TEXT_BRIGHT_BLUE + "white" + RESET_TEXT_COLOR + " or ");
-                                System.out.print(SET_TEXT_BRIGHT_BLUE + "black" + RESET_TEXT_COLOR + "\n");
-                                break;
-                            }
-
-                            JoinGameResult result = joinGameMenu(new JoinGameRequest(activeAuthToken, color.name(), Objects.requireNonNull(getGameFromList(split[1])).gameID()));
-                            switch (Objects.requireNonNull(result).httpCode()) {
-                                case 200:
-                                    enterGame(Objects.requireNonNull(getGameFromList(split[1])));
-                                    break;
-                                case 400:
-                                    System.out.print("There was a problem with your request.\n");
-                                    break;
-                                case 401:
-                                    System.out.print("Sorry, but you don't seem to be authorized.\n");
-                                    System.out.print("Try loging out and logging in again.\n");
-                                case 403:
-                                    System.out.print("Sorry, but that position is taken.\n");
-                                    break;
-                                case 500:
-                                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
-                                    break;
-                                default:
-                                    System.out.print("Something went wrong with your request\n");
-                                    System.out.print("Please try again shortly\n");
-                            }
-                        } else {
-                            badInputResponse();
-                        }
+                        joinGameMenu(split);
                         break;
                     case "observe":
                         if (split.length == 2) {
@@ -149,6 +76,88 @@ public class PostLogin {
 
     }
 
+    private void joinGameMenu(String[] split) {
+        if (split.length == 3) {
+            ChessGame.TeamColor color;
+            if (split[2].equalsIgnoreCase("white")) {
+                color = ChessGame.TeamColor.WHITE;
+            } else if (split[2].equalsIgnoreCase("black")) {
+                color = ChessGame.TeamColor.BLACK;
+            } else {
+                System.out.print("Sorry, I can't tell which team you are trying to join\n");
+                System.out.print("You can only join as ");
+                System.out.print(SET_TEXT_BRIGHT_BLUE + "white" + RESET_TEXT_COLOR + " or ");
+                System.out.print(SET_TEXT_BRIGHT_BLUE + "black" + RESET_TEXT_COLOR + "\n");
+                return;
+            }
+
+            JoinGameResult result = joinGameProcess(new JoinGameRequest
+                    (activeAuthToken, color.name(), Objects.requireNonNull(getGameFromList(split[1])).gameID()));
+            switch (Objects.requireNonNull(result).httpCode()) {
+                case 200:
+                    enterGame(Objects.requireNonNull(getGameFromList(split[1])));
+                    break;
+                case 400:
+                    System.out.print("There was a problem with your request.\n");
+                    break;
+                case 401:
+                    System.out.print("Sorry, but you don't seem to be authorized.\n");
+                    System.out.print("Try loging out and logging in again.\n");
+                case 403:
+                    System.out.print("Sorry, but that position is taken.\n");
+                    break;
+                case 500:
+                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
+                    break;
+                default:
+                    System.out.print("Something went wrong with your request\n");
+                    System.out.print("Please try again shortly\n");
+            }
+        } else {
+            badInputResponse();
+        }
+    }
+
+    private void creeateGameMenu(String[] split) {
+        if ((split.length == 2) && (split[1].length() <= UserInputConstraints.MAX_GAMENAME_LENGTH)) {
+            CreateGameResult result = createGameProcess(new CreateGameRequest(activeAuthToken, split[1]));
+            switch (Objects.requireNonNull(result).httpCode()) {
+                case 200:
+                    updateGameList();
+                    int index = -1;
+                    for (int i = 1; i >= activeGames.size(); i++) {
+                        if (Objects.requireNonNull(getGameFromList(String.valueOf(i))).gameID() == result.gameID()) {
+                            index = i;
+                        }
+                    }
+                    if (index == -1) {
+                        System.out.print("something went wrong with our database connection,");
+                        System.out.print("but your game may still have been made.\n");
+                        System.out.print("try calling " + SET_TEXT_BRIGHT_BLUE + "list" + RESET_TEXT_COLOR + "to check\n");
+                    } else {
+                        System.out.print("Your game has been created and currently assigned the ID ");
+                        System.out.print(SET_TEXT_BRIGHT_BLUE + index + RESET_TEXT_COLOR + "\n");
+                    }
+                    break;
+                case 400:
+                    System.out.print("There was a problem with your request.\n");
+                    System.out.print("Note: Game name must only be alphanumeric or an \"_\" character\n");
+                    break;
+                case 401:
+                    System.out.print("Sorry, but you don't seem to be authorized.\n");
+                    System.out.print("Try loging out and logging in again.\n");
+                case 500:
+                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
+                    break;
+                default:
+                    System.out.print("Something went wrong with your request\n");
+                    System.out.print("Please try again shortly\n");
+            }
+        } else {
+            badInputResponse();
+        }
+    }
+
     private void enterGame(GameData gameData) {
         if (username.equals(gameData.blackUsername())) {
             BoardPrinter.print(gameData.game(), ChessGame.TeamColor.BLACK, null);
@@ -158,15 +167,16 @@ public class PostLogin {
     }
 
 
-    private CreateGameResult createGameMenu(CreateGameRequest createGameRequest) {
-        if (!createGameRequest.gameName().matches("[a-zA-Z0-9_]+") || createGameRequest.gameName().length() > UserInputConstraints.MAX_GAMENAME_LENGTH) {
+    private CreateGameResult createGameProcess(CreateGameRequest createGameRequest) {
+        if (!createGameRequest.gameName().matches("[a-zA-Z0-9_]+") ||
+                createGameRequest.gameName().length() > UserInputConstraints.MAX_GAMENAME_LENGTH) {
             return new CreateGameResult(400, "Error: illegal game name", null);
         }
 
         return server.createGame(createGameRequest);
     }
 
-    private JoinGameResult joinGameMenu(JoinGameRequest joinGameRequest) {
+    private JoinGameResult joinGameProcess(JoinGameRequest joinGameRequest) {
         return server.joinGame(joinGameRequest);
     }
 
@@ -181,9 +191,12 @@ public class PostLogin {
 
 
         String header = String.format("║  %-5s ║ %-30s ║ %-30s ║ %-30s ║", "ID", "Game Name", "White Player", "Black Player");
-        String topBorder = "╔════════╦════════════════════════════════╦════════════════════════════════╦════════════════════════════════╗";
-        String midBorder = "╠════════╬════════════════════════════════╬════════════════════════════════╬════════════════════════════════╣";
-        String bottomBorder = "╚════════╩════════════════════════════════╩════════════════════════════════╩════════════════════════════════╝";
+        String topBorder =
+                "╔════════╦════════════════════════════════╦════════════════════════════════╦════════════════════════════════╗";
+        String midBorder =
+                "╠════════╬════════════════════════════════╬════════════════════════════════╬════════════════════════════════╣";
+        String bottomBorder =
+                "╚════════╩════════════════════════════════╩════════════════════════════════╩════════════════════════════════╝";
 
         System.out.println(topBorder);
         System.out.println(header);
