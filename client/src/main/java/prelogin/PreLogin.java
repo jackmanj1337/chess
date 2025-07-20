@@ -46,56 +46,10 @@ public class PreLogin {
                         System.out.println("I hope you enjoyed my game!");
                         System.exit(0);
                     case "login":
-                        if (split.length == 3) {
-                            LoginResult result = loginMenu(new LoginRequest(split[1], split[2]));
-                            switch (Objects.requireNonNull(result).httpCode()) {
-                                case 200:
-                                    System.out.print("Welcome " + split[1] + "\n");
-                                    postlogin.ui(result);
-                                    break;
-                                case 400:
-                                    System.out.print("There was a problem with your request.\n");
-                                    System.out.print("Note: Username and password must only be alphanumeric or an \"_\" character.\n");
-                                    break;
-                                case 401:
-                                    System.out.print("Sorry, but there is problem in your username or password.\n");
-                                    break;
-                                case 500:
-                                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
-                                    break;
-                                default:
-                                    System.out.print("Something went wrong with your request\n");
-                                    System.out.print("Please try again shortly\n");
-                            }
-                        } else {
-                            badInputResponse();
-                        }
+                        loginMenuHandler(split, postlogin);
                         break;
                     case "register":
-                        if (split.length == 4 && (split[1].length() <= UserInputConstraints.MAX_USERNAME_LENGTH)) {
-                            RegisterResult result = registerMenu(new RegisterRequest(split[1], split[2], split[3]));
-                            switch (Objects.requireNonNull(result).httpCode()) {
-                                case 200:
-                                    System.out.print("Welcome " + split[1] + "\n");
-                                    postlogin.ui(new LoginResult(result.httpCode(), result.message(), result.username(), result.authToken()));
-                                    break;
-                                case 400:
-                                    System.out.print("There was a problem with your request.\n");
-                                    System.out.print("Note: Username and password must only be alphanumeric or an \"_\" character.\n");
-                                    break;
-                                case 403:
-                                    System.out.print("Sorry, but that username is already in use.\n");
-                                    break;
-                                case 500:
-                                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
-                                    break;
-                                default:
-                                    System.out.print("Something went wrong with your request\n");
-                                    System.out.print("Please try again shortly\n");
-                            }
-                        } else {
-                            badInputResponse();
-                        }
+                        registerMenuHandler(split, postlogin);
                         break;
                     default:
                         badInputResponse();
@@ -107,6 +61,60 @@ public class PreLogin {
             scanner.close();
 
             return null;
+        }
+    }
+
+    private void registerMenuHandler(String[] split, PostLogin postlogin) {
+        if (split.length == 4 && (split[1].length() <= UserInputConstraints.MAX_USERNAME_LENGTH)) {
+            RegisterResult result = registerMenu(new RegisterRequest(split[1], split[2], split[3]));
+            switch (Objects.requireNonNull(result).httpCode()) {
+                case 200:
+                    System.out.print("Welcome " + split[1] + "\n");
+                    postlogin.ui(new LoginResult(result.httpCode(), result.message(), result.username(), result.authToken()));
+                    break;
+                case 400:
+                    System.out.print("There was a problem with your request.\n");
+                    System.out.print("Note: Username and password must only be alphanumeric or an \"_\" character.\n");
+                    break;
+                case 403:
+                    System.out.print("Sorry, but that username is already in use.\n");
+                    break;
+                case 500:
+                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
+                    break;
+                default:
+                    System.out.print("Something went wrong with your request\n");
+                    System.out.print("Please try again shortly\n");
+            }
+        } else {
+            badInputResponse();
+        }
+    }
+
+    private void loginMenuHandler(String[] split, PostLogin postlogin) {
+        if (split.length == 3) {
+            LoginResult result = loginMenu(new LoginRequest(split[1], split[2]));
+            switch (Objects.requireNonNull(result).httpCode()) {
+                case 200:
+                    System.out.print("Welcome " + split[1] + "\n");
+                    postlogin.ui(result);
+                    break;
+                case 400:
+                    System.out.print("There was a problem with your request.\n");
+                    System.out.print("Note: Username and password must only be alphanumeric or an \"_\" character.\n");
+                    break;
+                case 401:
+                    System.out.print("Sorry, but there is problem in your username or password.\n");
+                    break;
+                case 500:
+                    System.out.print("Sorry, but there appears to have been a problem with our database.\n");
+                    break;
+                default:
+                    System.out.print("Something went wrong with your request\n");
+                    System.out.print("Please try again shortly\n");
+            }
+        } else {
+            badInputResponse();
         }
     }
 
