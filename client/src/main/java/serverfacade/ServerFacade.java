@@ -32,7 +32,8 @@ public class ServerFacade {
             return json.fromJson(response.toString(), RegisterResult.class);
 
         } catch (IOException e) {
-            return new RegisterResult(500, "Error: " + e.getMessage(), null, null);
+            System.out.println(e.getMessage());
+            return new RegisterResult(501, "Error: " + e.getMessage(), null, null);
         }
     }
 
@@ -106,29 +107,34 @@ public class ServerFacade {
         connection.setRequestMethod(method);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
-        connection.setRequestProperty("Authorization", auth);
+        if (auth != null) {
+            connection.setRequestProperty("Authorization", auth);
+        }
 
-
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = body.getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
+        if (body != null && !body.isEmpty()) {
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = body.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
         }
 
         int status = connection.getResponseCode();
-        System.out.println("Status Code: " + status);
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+        InputStreamReader reader;
+        if (status >= 400) {
+            reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
+        } else {
+            reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
         }
 
-        in.close();
-        connection.disconnect();
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader in = new BufferedReader(reader)) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+        }
 
-        System.out.println(response);
+        connection.disconnect();
         return response;
     }
 }
