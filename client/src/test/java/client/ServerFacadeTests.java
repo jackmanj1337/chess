@@ -11,6 +11,8 @@ import serverfacade.ServerFacade;
 import serverfacade.requests.*;
 import serverfacade.results.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class ServerFacadeTests {
 
@@ -63,6 +65,18 @@ public class ServerFacadeTests {
         System.out.println(loutresult.toString());
 
         Assertions.assertTrue(true);
+    }
+
+    @Test
+    public void RegisterTest() {
+        RegisterResult result = facade.register(new RegisterRequest("doug", "password", "doug@testing.com"));
+        assertEquals(200, result.httpCode());
+    }
+
+    @Test
+    public void RegisterTestNullPassword() {
+        RegisterResult result = facade.register(new RegisterRequest("doug", null, "doug@testing.com"));
+        assertEquals(400, result.httpCode());
     }
 
 
