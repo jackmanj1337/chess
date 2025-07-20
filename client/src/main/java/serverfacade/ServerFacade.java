@@ -23,37 +23,11 @@ public class ServerFacade {
         this.urlBase = urlBase;
     }
 
-    public RegisterResult register(RegisterRequest regReq) {
+    public RegisterResult register(RegisterRequest req) {
         try {
-            URL url = new URL(urlBase + "/user");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            String body = json.toJson(req);
 
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            String body = json.toJson(regReq);
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = body.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int status = connection.getResponseCode();
-            System.out.println("Status Code: " + status);
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-
-            in.close();
-            connection.disconnect();
-
-            System.out.println(response);
+            StringBuilder response = requestMaker("/user", "POST", null, body);
 
             return json.fromJson(response.toString(), RegisterResult.class);
 
@@ -62,40 +36,13 @@ public class ServerFacade {
         }
     }
 
-    public LoginResult login(LoginRequest linReq) {
+    public LoginResult login(LoginRequest req) {
         try {
-            URL url = new URL(urlBase + "/session");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            String body = json.toJson(req);
 
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            String body = json.toJson(linReq);
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = body.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int status = connection.getResponseCode();
-            System.out.println("Status Code: " + status);
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-
-            in.close();
-            connection.disconnect();
-
-            System.out.println(response);
+            StringBuilder response = requestMaker("/session", "POST", null, body);
 
             return json.fromJson(response.toString(), LoginResult.class);
-
         } catch (IOException e) {
             return new LoginResult(500, "Error: " + e.getMessage(), null, null);
         }
@@ -103,53 +50,85 @@ public class ServerFacade {
 
     public LogoutResult logout(LogoutRequest req) {
         try {
-            URL url = new URL(urlBase + "/session");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            connection.setRequestMethod("DELETE");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Authorization", req.authToken());
-
             String body = json.toJson(req);
 
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = body.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int status = connection.getResponseCode();
-            System.out.println("Status Code: " + status);
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-
-            in.close();
-            connection.disconnect();
-
-            System.out.println(response);
+            StringBuilder response = requestMaker("/session", "DELETE", req.authToken(), body);
 
             return json.fromJson(response.toString(), LogoutResult.class);
-
         } catch (IOException e) {
             return new LogoutResult(500, "Error: " + e.getMessage());
         }
     }
 
     public CreateGameResult createGame(CreateGameRequest req) {
-        return null;
+        try {
+            String body = json.toJson(req);
+
+            StringBuilder response = requestMaker("/game", "POST", req.authToken(), body);
+
+            return json.fromJson(response.toString(), CreateGameResult.class);
+        } catch (IOException e) {
+            return new CreateGameResult(500, "Error: " + e.getMessage(), null);
+        }
     }
 
     public ListGamesResult listGames(ListGamesRequest req) {
-        return null;
+        try {
+            String body = json.toJson(req);
+
+            StringBuilder response = requestMaker("/game", "GET", req.authToken(), body);
+
+            return json.fromJson(response.toString(), ListGamesResult.class);
+
+        } catch (IOException e) {
+            return new ListGamesResult(500, "Error: " + e.getMessage(), null);
+        }
     }
 
     public JoinGameResult joinGame(JoinGameRequest req) {
-        return null;
+        try {
+            String body = json.toJson(req);
+
+            StringBuilder response = requestMaker("/game", "PUT", req.authToken(), body);
+
+            return json.fromJson(response.toString(), JoinGameResult.class);
+
+        } catch (IOException e) {
+            return new JoinGameResult(500, "Error: " + e.getMessage());
+        }
+    }
+
+
+    private StringBuilder requestMaker(String path, String method, String auth, String body) throws IOException {
+        URL url = new URL(urlBase + path);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod(method);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Authorization", auth);
+
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = body.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+
+        int status = connection.getResponseCode();
+        System.out.println("Status Code: " + status);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+
+        in.close();
+        connection.disconnect();
+
+        System.out.println(response);
+        return response;
     }
 }

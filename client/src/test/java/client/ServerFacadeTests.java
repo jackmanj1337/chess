@@ -45,29 +45,6 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-
-
-        System.out.println("calling facade register");
-        RegisterResult result = facade.register(new RegisterRequest("doug", "password", "doug@testing.com"));
-
-        System.out.println("returned results");
-        System.out.println(result.toString());
-
-        System.out.println("\n\ncalling facade login");
-        LoginResult linresult = facade.login(new LoginRequest("doug", "password"));
-        System.out.println("returned results");
-        System.out.println(linresult.toString());
-
-        System.out.println("\n\ncalling facade logout");
-        LogoutResult loutresult = facade.logout(new LogoutRequest(linresult.authToken()));
-        System.out.println("returned results");
-        System.out.println(loutresult.toString());
-
-        Assertions.assertTrue(true);
-    }
-
-    @Test
     public void registerTest() {
         RegisterResult result = facade.register(new RegisterRequest("doug", "password", "doug@testing.com"));
         assertEquals(200, result.httpCode());
