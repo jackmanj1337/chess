@@ -13,6 +13,7 @@ import static java.sql.Types.NULL;
 public class SQLDAO {
     protected static final Gson GSON = new Gson();
 
+    //TODO add safegaurds for concurent access
     protected static int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
