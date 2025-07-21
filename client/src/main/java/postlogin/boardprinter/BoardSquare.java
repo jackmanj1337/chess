@@ -20,9 +20,14 @@ public class BoardSquare {
         content = EMPTY;
     }
 
-    public void highlight() {
-        color = HIGHLIGHT_COLOR;
+    public void highlightMove() {
+        color = MOVE_HIGHLIGHT_COLOR;
     }
+
+    public void highlightPiece() {
+        color = PIECE_HIGHLIGHT_COLOR;
+    }
+
 
     public void fillSquare(ChessPiece piece) {
         if (piece != null) {

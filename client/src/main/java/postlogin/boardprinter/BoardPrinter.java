@@ -15,10 +15,11 @@ public class BoardPrinter {
     public static void print(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition) {
         BoardSquare[][] board = getFullBoard(game);
 
-        if (selectedPosition != null) {
+        if (selectedPosition != null && game.getBoard().getPiece(selectedPosition) != null) {
+            board[selectedPosition.getRow()][selectedPosition.getColumn()].highlightPiece();
             Collection<ChessMove> moves = game.validMoves(selectedPosition);
             for (ChessMove move : moves) {
-                board[move.getEndPosition().getRow()][move.getEndPosition().getColumn()].highlight();
+                board[move.getEndPosition().getRow()][move.getEndPosition().getColumn()].highlightMove();
             }
         }
 
