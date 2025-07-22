@@ -25,7 +25,7 @@ public class Main {
         );
 
 
-        ServerFacade server = new ServerFacade("http://localhost:8080");
+        ServerFacade server = new ServerFacade("localhost:8080");
         PreLogin preLogin = new PreLogin(server);
         while (true) {
             preLogin.ui();

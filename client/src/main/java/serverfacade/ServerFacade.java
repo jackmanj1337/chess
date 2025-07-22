@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -16,11 +14,13 @@ import serverfacade.results.*;
 import serverfacade.requests.*;
 
 public class ServerFacade {
-    String urlBase;
+    String httpurl;
+    String wsurl;
     Gson json = new Gson();
 
     public ServerFacade(String urlBase) {
-        this.urlBase = urlBase;
+        this.httpurl = "http://" + urlBase;
+        this.wsurl = "ws://" + urlBase;
     }
 
     public RegisterResult register(RegisterRequest req) {
@@ -110,7 +110,7 @@ public class ServerFacade {
 
 
     private StringBuilder requestMaker(String path, String method, String auth, String body) throws IOException {
-        URL url = new URL(urlBase + path);
+        URL url = new URL(httpurl + path);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setRequestMethod(method);

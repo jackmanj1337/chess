@@ -4,6 +4,8 @@ import handlers.DBHandler;
 import handlers.GameHandler;
 import handlers.UserHandler;
 import spark.*;
+import server.WebsocketServer;
+
 
 public class Server {
 
@@ -13,11 +15,12 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        Spark.webSocket("/ws", WebsocketServer.class);
         // Register your endpoints and handle exceptions here.
         registerRoutes();
 
 
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
 
         Spark.awaitInitialization();
