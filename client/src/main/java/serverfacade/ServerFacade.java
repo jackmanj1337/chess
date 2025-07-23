@@ -12,15 +12,18 @@ import java.nio.charset.StandardCharsets;
 
 import serverfacade.results.*;
 import serverfacade.requests.*;
+import utilities.ServerConnectionSettings;
 
 public class ServerFacade {
     String httpurl;
-    String wsurl;
     Gson json = new Gson();
 
     public ServerFacade(String urlBase) {
         this.httpurl = "http://" + urlBase;
-        this.wsurl = "ws://" + urlBase;
+    }
+
+    public ServerFacade() {
+        this.httpurl = "http://" + ServerConnectionSettings.SERVER_LOCATION;
     }
 
     public RegisterResult register(RegisterRequest req) {

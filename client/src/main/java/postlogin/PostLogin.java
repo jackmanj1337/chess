@@ -188,9 +188,9 @@ public class PostLogin {
 
     private void enterGame(GameData gameData, boolean asBlack) {
         if (asBlack) {
-            BoardPrinter.print(gameData.game(), ChessGame.TeamColor.BLACK, null);
+
         } else {
-            BoardPrinter.print(gameData.game(), ChessGame.TeamColor.WHITE, null);
+
         }
     }
 

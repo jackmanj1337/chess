@@ -12,7 +12,7 @@ import static postlogin.boardprinter.BoardSquare.*;
 public class BoardPrinter {
 
 
-    public static void print(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition) {
+    public static void print(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition, String activePlayer) {
         BoardSquare[][] board = getFullBoard(game);
 
         if (selectedPosition != null && game.getBoard().getPiece(selectedPosition) != null) {
@@ -39,6 +39,7 @@ public class BoardPrinter {
                 System.out.print("\n");
             }
         }
+        System.out.print(activePlayer + "<" + game.getTeamTurn() + "> is the active player\n");
 
 
     }

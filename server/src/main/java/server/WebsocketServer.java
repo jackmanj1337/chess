@@ -89,6 +89,13 @@ public class WebsocketServer {
     public static void removeUserFromGame(PlayerSession session) {
         gameSessions.getOrDefault(session.gameID(), Set.of()).remove(session);
         sessionToPlayer.remove(session.session());
+        if (session.session() != null && session.session().isOpen()) {
+            try {
+                session.session().close(200, "player left the game");
+            } catch (Exception e) {
+                System.err.println("Failed to close session: " + e.getMessage());
+            }
+        }
     }
 
 

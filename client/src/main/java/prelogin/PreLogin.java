@@ -119,7 +119,7 @@ public class PreLogin {
     }
 
 
-    private static void badInputResponse() {
+    public static void badInputResponse() {
         System.out.println("I am sorry. I didn't quite understand that.");
         System.out.println
                 ("Please try again, or type "
