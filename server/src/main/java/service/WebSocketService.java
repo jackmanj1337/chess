@@ -43,7 +43,7 @@ public class WebSocketService {
 
                 ServerMessage newConnection = ServerMessage.newNotification(connected + " joined as " + status);
                 broadcastToGame(playerSession.gameID(), newConnection, playerSession);
-                sendToPlayer(playerSession, ServerMessage.newLoadGame(gameData.game()));
+                sendToPlayer(playerSession, ServerMessage.newLoadGame(gameData));
             }
         } catch (DataAccessException e) {
             System.out.println("Error: " + e);
@@ -66,14 +66,16 @@ public class WebSocketService {
                 try {
                     game.makeMove(request.getMove());
 
-                    games.updateGameData(new GameData(
+                    GameData data = new GameData(
                             gameData.gameID(),
                             gameData.whiteUsername(),
                             gameData.blackUsername(),
                             gameData.gameName(),
-                            game));
+                            game);
 
-                    WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newLoadGame(game), null);
+                    games.updateGameData(data);
+
+                    WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newLoadGame(data), null);
                 } catch (InvalidMoveException e) {
                     sendToPlayer(playerSession, ServerMessage.newErrorMessage(e.getMessage()));
                 }
@@ -109,14 +111,16 @@ public class WebSocketService {
                 ChessGame endedGame = gameData.game();
                 endedGame.setTeamTurn(null);
 
-                games.updateGameData(new GameData(
+                GameData data = new GameData(
                         gameData.gameID(),
                         gameData.whiteUsername(),
                         gameData.blackUsername(),
                         gameData.gameName(),
-                        endedGame));
+                        endedGame);
 
-                WebsocketServer.broadcastToGame(playerSession.gameID(), ServerMessage.newLoadGame(endedGame), null);
+                games.updateGameData(data);
+
+                WebsocketServer.broadcastToGame(playerSession.gameID(), ServerMessage.newLoadGame(data), null);
 
 
             }

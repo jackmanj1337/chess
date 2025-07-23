@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import postlogin.gameplay.NotificationManager;
 import utilities.ServerConnectionSettings;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.net.URI;
 
@@ -55,7 +57,21 @@ public class WebsocketFacade {
     @OnWebSocketMessage
     public void onMessage(String msg) {
         System.out.println("Received message from server: " + msg);
-
+        ServerMessage message = GSON.fromJson(msg, ServerMessage.class);
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION:
+                NotificationManager.handleNotification(message.getMessage());
+                break;
+            case ERROR:
+                NotificationManager.handleError(message.getErrorMessage());
+                break;
+            case LOAD_GAME:
+                NotificationManager.handleLoadGame(message.getGame());
+                break;
+            default:
+                System.out.println("Unhandled message type: " + message.getServerMessageType());
+                break;
+        }
     }
 
     @OnWebSocketClose
@@ -68,7 +84,8 @@ public class WebsocketFacade {
         cause.printStackTrace();
     }
 
-    public void sendMessage(User) {
+    public void sendMessage(UserGameCommand command) {
+        String message = GSON.toJson(command);
         if (session != null && session.isOpen()) {
             try {
                 session.getRemote().sendString(message);

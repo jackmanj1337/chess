@@ -2,7 +2,7 @@ package postlogin;
 
 import chess.ChessGame;
 import model.GameData;
-import postlogin.boardprinter.BoardPrinter;
+import postlogin.gameplay.Gameplay;
 import serverfacade.ServerFacade;
 
 import static utilities.EscapeSequences.*;
@@ -59,7 +59,7 @@ public class PostLogin {
                     if (split.length == 2) {
                         GameData game = getGameFromList(split[1]);
                         if (game != null) {
-                            enterGame(Objects.requireNonNull(game), false);
+                            enterGame(Objects.requireNonNull(game), null);
                         } else {
                             System.out.print("Sorry, I cant find that game\n");
                         }
@@ -110,7 +110,7 @@ public class PostLogin {
                     (activeAuthToken, color.name(), game.gameID()));
             switch (Objects.requireNonNull(result).httpCode()) {
                 case 200:
-                    enterGame(Objects.requireNonNull(getGameFromList(split[1])), color.name().equals("BLACK"));
+                    enterGame(Objects.requireNonNull(getGameFromList(split[1])), color.name());
                     break;
                 case 400:
                     System.out.print("There was a problem with your request.\n");
@@ -186,12 +186,17 @@ public class PostLogin {
     }
 
 
-    private void enterGame(GameData gameData, boolean asBlack) {
-        if (asBlack) {
-
+    private void enterGame(GameData gameData, String status) {
+        ChessGame.TeamColor pos;
+        if (Objects.equals(status, "WHITE")) {
+            pos = ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(status, "BLACK")) {
+            pos = ChessGame.TeamColor.BLACK;
         } else {
-
+            pos = null;
         }
+        Gameplay game = new Gameplay(activeAuthToken, username, gameData.gameID(), scanner, server, pos);
+        game.ui();
     }
 
 

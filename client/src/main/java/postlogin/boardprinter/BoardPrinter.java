@@ -3,6 +3,8 @@ package postlogin.boardprinter;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
+import model.GameData;
+import postlogin.gameplay.Gameplay;
 
 
 import java.util.Collection;
@@ -12,19 +14,19 @@ import static postlogin.boardprinter.BoardSquare.*;
 public class BoardPrinter {
 
 
-    public static void print(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition, String activePlayer) {
-        BoardSquare[][] board = getFullBoard(game);
+    public static void print(ChessGame.TeamColor perspective, ChessPosition selectedPosition, GameData data) {
+        BoardSquare[][] board = getFullBoard(data.game());
 
-        if (selectedPosition != null && game.getBoard().getPiece(selectedPosition) != null) {
+        if (selectedPosition != null && data.game().getBoard().getPiece(selectedPosition) != null) {
             board[selectedPosition.getRow()][selectedPosition.getColumn()].highlightPiece();
-            Collection<ChessMove> moves = game.validMoves(selectedPosition);
+            Collection<ChessMove> moves = data.game().validMoves(selectedPosition);
             for (ChessMove move : moves) {
                 board[move.getEndPosition().getRow()][move.getEndPosition().getColumn()].highlightMove();
             }
         }
 
 
-        if (perspective == ChessGame.TeamColor.WHITE) {
+        if (perspective == ChessGame.TeamColor.WHITE || perspective == null) {
             for (int i = 9; i >= 0; i--) {
                 for (int j = 0; j < 10; j++) {
                     board[i][j].print();
@@ -39,9 +41,16 @@ public class BoardPrinter {
                 System.out.print("\n");
             }
         }
-        System.out.print(activePlayer + "<" + game.getTeamTurn() + "> is the active player\n");
 
-
+        if (data.game().getTeamTurn() == ChessGame.TeamColor.WHITE) {
+            System.out.print(data.whiteUsername() + "<WHITE> is the active player\n");
+        }
+        if (data.game().getTeamTurn() == ChessGame.TeamColor.BLACK) {
+            System.out.print(data.blackUsername() + "<BLACK> is the active player\n");
+        }
+        if (data.game().getTeamTurn() == null) {
+            System.out.print("This Game has ended\n");
+        }
     }
 
     private static BoardSquare[][] getFullBoard(ChessGame game) {
