@@ -1,0 +1,157 @@
+package service;
+
+import chess.ChessGame;
+import chess.InvalidMoveException;
+import com.google.gson.Gson;
+import dataaccess.DAOManager;
+import dataaccess.DataAccessException;
+import dataaccess.dainterface.AuthDAI;
+import dataaccess.dainterface.GameDAI;
+import dataaccess.dainterface.UserDAI;
+import handlers.PlayerSession;
+import model.GameData;
+import server.WebsocketServer;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
+
+import java.util.Objects;
+
+import static server.WebsocketServer.broadcastToGame;
+import static server.WebsocketServer.sendToPlayer;
+
+
+public class WebSocketService {
+    static final GameDAI games = DAOManager.games;
+    static final AuthDAI auths = DAOManager.auths;
+    static final UserDAI users = DAOManager.users;
+    static final Gson GSON = new Gson();
+
+    public static void handleConnect(PlayerSession playerSession) {
+        try {
+            if (verifyAuth(playerSession)) {
+                WebsocketServer.connectUserToGame(playerSession);
+            }
+        } catch (DataAccessException e) {
+            System.out.println("Error: " + e);
+            try {
+                ServerMessage connectionFailedError = ServerMessage.newErrorMessage(e.getMessage());
+                playerSession.session().getRemote().sendString(GSON.toJson(connectionFailedError));
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+    }
+
+
+    public static void handleMakeMove(UserGameCommand request, PlayerSession playerSession) {
+        try {
+            GameData gameData = games.getGame(request.getGameID());
+            ChessGame game = gameData.game();
+            if (verifyAuth(playerSession) && playerIsColor(playerSession,
+                    game.getBoard().getPiece(request.getMove().getStartPosition()).getTeamColor())) {
+                try {
+                    game.makeMove(request.getMove());
+
+                    games.updateGameData(new GameData(
+                            gameData.gameID(),
+                            gameData.whiteUsername(),
+                            gameData.blackUsername(),
+                            gameData.gameName(),
+                            game));
+
+                    WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newLoadGame(game), null);
+                } catch (InvalidMoveException e) {
+                    sendToPlayer(playerSession, ServerMessage.newErrorMessage(e.getMessage()));
+                }
+            } else {
+                sendToPlayer(playerSession, ServerMessage.newErrorMessage("You don't have authority to make that move"));
+            }
+        } catch (DataAccessException e) {
+            System.out.println("Error: " + e);
+            try {
+                ServerMessage connectionFailedError = ServerMessage.newErrorMessage(e.getMessage());
+                playerSession.session().getRemote().sendString(GSON.toJson(connectionFailedError));
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+    }
+
+    public static void handleResign(PlayerSession playerSession) {
+        try {
+            if (verifyAuth(playerSession) &&
+                    (playerIsColor(playerSession, ChessGame.TeamColor.WHITE) ||
+                            playerIsColor(playerSession, ChessGame.TeamColor.BLACK))) {
+                String loser = auths.getAuthFromToken(playerSession.authToken()).username();
+                GameData gameData = games.getGame(playerSession.gameID());
+                String winner = (Objects.equals(loser, gameData.whiteUsername())) ?
+                        gameData.blackUsername() : gameData.whiteUsername();
+                if (winner == null) {
+                    winner = "<NO_PLAYER_FOUND>";
+                }
+                String message = loser + "has conceded the game to " + winner;
+                broadcastToGame(playerSession.gameID(), ServerMessage.newNotification(message), playerSession);
+
+                ChessGame endedGame = gameData.game();
+                endedGame.setTeamTurn(null);
+
+                games.updateGameData(new GameData(
+                        gameData.gameID(),
+                        gameData.whiteUsername(),
+                        gameData.blackUsername(),
+                        gameData.gameName(),
+                        endedGame));
+
+                WebsocketServer.broadcastToGame(playerSession.gameID(), ServerMessage.newLoadGame(endedGame), null);
+
+
+            }
+        } catch (DataAccessException e) {
+            System.out.println("Error: " + e);
+            try {
+                ServerMessage connectionFailedError = ServerMessage.newErrorMessage(e.getMessage());
+                playerSession.session().getRemote().sendString(GSON.toJson(connectionFailedError));
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+    }
+
+    public static void handleLeave(PlayerSession playerSession) {
+        try {
+            if (verifyAuth(playerSession)) {
+                WebsocketServer.removeUserFromGame(playerSession);
+            }
+        } catch (DataAccessException e) {
+            System.out.println("Error: " + e);
+            try {
+                ServerMessage connectionFailedError = ServerMessage.newErrorMessage(e.getMessage());
+                playerSession.session().getRemote().sendString(GSON.toJson(connectionFailedError));
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+    }
+
+    private static boolean verifyAuth(PlayerSession playerSession) throws DataAccessException {
+        return Objects.equals(playerSession.authToken(), auths.getAuthFromToken(playerSession.authToken()).authToken());
+    }
+
+    private static boolean playerIsColor(PlayerSession playerSession, ChessGame.TeamColor color) throws DataAccessException {
+        String username = auths.getAuthFromToken(playerSession.authToken()).username();
+        GameData game = games.getGame(playerSession.gameID());
+        if (color == ChessGame.TeamColor.WHITE) {
+            if (Objects.equals(game.whiteUsername(), username)) {
+                return true;
+            }
+        }
+        if (color == ChessGame.TeamColor.BLACK) {
+            if (Objects.equals(game.blackUsername(), username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+}

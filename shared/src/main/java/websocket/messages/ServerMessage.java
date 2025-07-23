@@ -31,7 +31,7 @@ public class ServerMessage {
         return this.serverMessageType;
     }
 
-    public ServerMessage newNotification(String message) {
+    public static ServerMessage newNotification(String message) {
         ServerMessage notification = new ServerMessage(ServerMessageType.NOTIFICATION);
         notification.message = message;
         return notification;
@@ -42,7 +42,7 @@ public class ServerMessage {
         return message;
     }
 
-    public ServerMessage newErrorMessage(String message) {
+    public static ServerMessage newErrorMessage(String message) {
         ServerMessage error = new ServerMessage(ServerMessageType.ERROR);
         error.errorMessage = message;
         return error;
@@ -52,7 +52,7 @@ public class ServerMessage {
         return errorMessage;
     }
 
-    public ServerMessage newLoadGame(ChessGame game) {
+    public static ServerMessage newLoadGame(ChessGame game) {
         ServerMessage load = new ServerMessage(ServerMessageType.LOAD_GAME);
         load.game = game;
         return load;
