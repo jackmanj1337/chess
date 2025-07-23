@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -43,11 +44,6 @@ public class WebsocketServer {
             case RESIGN -> WebSocketService.handleResign(playerSession);
             case LEAVE -> WebSocketService.handleLeave(playerSession);
         }
-
-        ServerMessage response = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-
-
-        sendToPlayer(playerSession, response);
     }
 
     public static void sendToPlayer(PlayerSession playerSession, ServerMessage response) {
@@ -74,8 +70,11 @@ public class WebsocketServer {
     }
 
     public static void connectUserToGame(PlayerSession session) {
-        gameSessions.get(session.gameID()).add(session);
+        gameSessions
+                .computeIfAbsent(session.gameID(), k -> new HashSet<>())
+                .add(session);
     }
+
 
     public static void removeUserFromGame(PlayerSession session) {
         gameSessions.get(session.gameID()).remove(session);

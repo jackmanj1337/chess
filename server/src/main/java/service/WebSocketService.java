@@ -30,6 +30,20 @@ public class WebSocketService {
         try {
             if (verifyAuth(playerSession)) {
                 WebsocketServer.connectUserToGame(playerSession);
+                String connected = auths.getAuthFromToken(playerSession.authToken()).username();
+                GameData gameData = games.getGame(playerSession.gameID());
+                String status;
+                if (connected == gameData.whiteUsername()) {
+                    status = "<WHITE>";
+                } else if (connected == gameData.blackUsername()) {
+                    status = "<BLACK>";
+                } else {
+                    status = "<OBSERVER>";
+                }
+
+                ServerMessage newConnection = ServerMessage.newNotification(connected + " joined as " + status);
+                broadcastToGame(playerSession.gameID(), newConnection, playerSession);
+                sendToPlayer(playerSession, ServerMessage.newLoadGame(gameData.game()));
             }
         } catch (DataAccessException e) {
             System.out.println("Error: " + e);
@@ -120,6 +134,9 @@ public class WebSocketService {
     public static void handleLeave(PlayerSession playerSession) {
         try {
             if (verifyAuth(playerSession)) {
+                String user = auths.getAuthFromToken(playerSession.authToken()).username();
+                ServerMessage leaveNotification = ServerMessage.newNotification(user + " has left the game");
+                broadcastToGame(playerSession.gameID(), leaveNotification, playerSession);
                 WebsocketServer.removeUserFromGame(playerSession);
             }
         } catch (DataAccessException e) {
@@ -134,7 +151,7 @@ public class WebSocketService {
     }
 
     private static boolean verifyAuth(PlayerSession playerSession) throws DataAccessException {
-        return Objects.equals(playerSession.authToken(), auths.getAuthFromToken(playerSession.authToken()).authToken());
+        return Objects.nonNull(auths.getAuthFromToken(playerSession.authToken()));
     }
 
     private static boolean playerIsColor(PlayerSession playerSession, ChessGame.TeamColor color) throws DataAccessException {
