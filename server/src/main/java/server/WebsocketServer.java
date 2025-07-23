@@ -19,17 +19,26 @@ public class WebsocketServer {
     private static final Gson GSON = new Gson();
 
     private static final Map<Integer, Set<PlayerSession>> gameSessions = new ConcurrentHashMap<>();
+    private static final Map<Session, PlayerSession> sessionToPlayer = new ConcurrentHashMap<>();
 
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
+        session.setIdleTimeout(600000); // 600000 ms = 10 minutes
         System.out.println("WebSocket Connected: " + session);
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
         System.out.println("WebSocket Closed: " + session + ", Reason: " + reason);
+
+        PlayerSession playerSession = sessionToPlayer.get(session);
+        if (playerSession != null) {
+            WebSocketService.handleLeave(playerSession);  // new method below
+            removeUserFromGame(playerSession);
+        }
     }
+
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
@@ -73,11 +82,13 @@ public class WebsocketServer {
         gameSessions
                 .computeIfAbsent(session.gameID(), k -> new HashSet<>())
                 .add(session);
+        sessionToPlayer.put(session.session(), session);
     }
 
 
     public static void removeUserFromGame(PlayerSession session) {
-        gameSessions.get(session.gameID()).remove(session);
+        gameSessions.getOrDefault(session.gameID(), Set.of()).remove(session);
+        sessionToPlayer.remove(session.session());
     }
 
 
