@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DAOManager;
-import dataaccess.DataAccessException;
 import dataaccess.dainterface.AuthDAI;
 import dataaccess.dainterface.GameDAI;
 import handlers.PlayerSession;
@@ -21,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebsocketServer {
     private static final Gson GSON = new Gson();
 
-    private static final Map<Integer, Set<PlayerSession>> gameSessions = new ConcurrentHashMap<>();
-    private static final Map<Session, PlayerSession> sessionToPlayer = new ConcurrentHashMap<>();
+    private static final Map<Integer, Set<PlayerSession>> GAME_SESSIONS = new ConcurrentHashMap<>();
+    private static final Map<Session, PlayerSession> SESSIONS_TO_PLAYER = new ConcurrentHashMap<>();
 
 
     @OnWebSocketConnect
@@ -34,7 +33,7 @@ public class WebsocketServer {
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
         System.out.println("Connection closed: " + reason);
-        PlayerSession ps = sessionToPlayer.get(session);
+        PlayerSession ps = SESSIONS_TO_PLAYER.get(session);
         if (ps != null) {
             removeUserFromGame(ps);
         }
@@ -66,7 +65,7 @@ public class WebsocketServer {
 
     public static void broadcastToGame(int gameID, ServerMessage message, PlayerSession origin) {
         String json = GSON.toJson(message);
-        Set<PlayerSession> sessions = gameSessions.getOrDefault(gameID, Set.of());
+        Set<PlayerSession> sessions = GAME_SESSIONS.getOrDefault(gameID, Set.of());
 
         String senderToken = origin != null ? origin.authToken() : null;
 
@@ -90,17 +89,17 @@ public class WebsocketServer {
         if (!toRemove.isEmpty()) {
             sessions.removeAll(toRemove);
             if (sessions.isEmpty()) {
-                gameSessions.remove(gameID);
+                GAME_SESSIONS.remove(gameID);
             }
         }
     }
 
 
     public static void connectUserToGame(PlayerSession session) {
-        gameSessions
+        GAME_SESSIONS
                 .computeIfAbsent(session.gameID(), k -> new HashSet<>())
                 .add(session);
-        sessionToPlayer.put(session.session(), session);
+        SESSIONS_TO_PLAYER.put(session.session(), session);
     }
 
 
@@ -111,14 +110,14 @@ public class WebsocketServer {
             String authToken = session.authToken();
 
 
-            Set<PlayerSession> sessions = gameSessions.get(gameID);
+            Set<PlayerSession> sessions = GAME_SESSIONS.get(gameID);
             if (sessions != null) {
                 sessions.removeIf(ps -> Objects.equals(ps.authToken(), authToken));
                 if (sessions.isEmpty()) {
-                    gameSessions.remove(gameID); // optional cleanup
+                    GAME_SESSIONS.remove(gameID); // optional cleanup
                 }
             }
-            sessionToPlayer.remove(socket);
+            SESSIONS_TO_PLAYER.remove(socket);
 
             // Fetch user identity
             AuthDAI auths = DAOManager.auths;

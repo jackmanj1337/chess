@@ -70,16 +70,6 @@ public class WebsocketFacade {
         }
     }
 
-    @OnClose
-    public void onClose(Session session, CloseReason reason) {
-        System.out.println("Connection closed: " + reason.getReasonPhrase());
-        this.session = null;
-    }
-
-    @OnError
-    public void onError(Session session, Throwable cause) {
-        cause.printStackTrace();
-    }
 
     public void sendMessage(UserGameCommand command) {
         String message = GSON.toJson(command);

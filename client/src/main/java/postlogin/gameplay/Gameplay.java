@@ -80,13 +80,7 @@ public class Gameplay {
                         if (split.length == 3) {
                             promotion = null;
                         } else {
-                            promotion = switch (split[3].toUpperCase()) {
-                                case "QUEEN" -> ChessPiece.PieceType.QUEEN;
-                                case "ROOK" -> ChessPiece.PieceType.ROOK;
-                                case "BISHOP" -> ChessPiece.PieceType.BISHOP;
-                                case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
-                                default -> null;
-                            };
+                            promotion = chessPieceNameToType(split[3]);
                         }
                         ChessMove move = new ChessMove(start, end, promotion);
                         boolean goodMove = true;
@@ -118,6 +112,16 @@ public class Gameplay {
 
             }
         }
+    }
+
+    private static ChessPiece.PieceType chessPieceNameToType(String in) {
+        return switch (in.toUpperCase()) {
+            case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+            case "ROOK" -> ChessPiece.PieceType.ROOK;
+            case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+            case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+            default -> null;
+        };
     }
 
     private ChessPosition notationToPosition(String notation) {
