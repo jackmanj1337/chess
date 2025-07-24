@@ -32,6 +32,10 @@ public class WebSocketService {
                 WebsocketServer.connectUserToGame(playerSession);
                 String connected = auths.getAuthFromToken(playerSession.authToken()).username();
                 GameData gameData = games.getGame(playerSession.gameID());
+                if (gameData == null) {
+                    sendToPlayer(playerSession, ServerMessage.newErrorMessage("Your game ID was corrupted"));
+                    return;
+                }
                 String status;
                 if (Objects.equals(connected, gameData.whiteUsername())) {
                     status = "<WHITE>";
@@ -44,6 +48,9 @@ public class WebSocketService {
                 ServerMessage newConnection = ServerMessage.newNotification(connected + " joined as " + status);
                 broadcastToGame(playerSession.gameID(), newConnection, playerSession);
                 sendToPlayer(playerSession, ServerMessage.newLoadGame(gameData));
+            } else {
+                sendToPlayer(playerSession, ServerMessage.newErrorMessage("Your authentication was corrupted"));
+                return;
             }
         } catch (DataAccessException e) {
             System.out.println("Error: " + e);
