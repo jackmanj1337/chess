@@ -2,6 +2,8 @@ package chess;
 
 import java.util.Objects;
 
+import static chess.ChessPiece.PieceType.QUEEN;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -43,6 +45,22 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+    public String toDisplayString() {
+        String promotion = null;
+        if (promotionPiece != null) {
+            String pieceTypeIcon = switch (promotionPiece) {
+                case KING -> "♚";
+                case QUEEN -> "♛";
+                case ROOK -> "♜";
+                case BISHOP -> "♝";
+                case KNIGHT -> "♞";
+                case PAWN -> "♟";
+            };
+            promotion = " Promotion:" + pieceTypeIcon;
+        }
+        return startPosition.toDisplayString() + " -> " + endPosition.toDisplayString() + promotion;
     }
 
     @Override

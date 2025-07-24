@@ -42,6 +42,15 @@ public class ChessPosition {
         return getRow() == that.getRow() && col == that.col;
     }
 
+    public String toDisplayString() {
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            return "invalid";
+        }
+        char file = (char) ('a' + col - 1);
+        return String.valueOf(file) + row;
+    }
+
+
     @Override
     public int hashCode() {
         return Objects.hash(getRow(), col);

@@ -64,6 +64,8 @@ public class WebSocketService {
             if (verifyAuth(playerSession) && playerIsColor(playerSession,
                     game.getBoard().getPiece(request.getMove().getStartPosition()).getTeamColor())) {
                 try {
+                    String sendingPlayerName = auths.getAuthFromToken(playerSession.authToken()).username();
+                    String movingTeam = "<" + game.getTeamTurn().toString() + ">";
                     game.makeMove(request.getMove());
 
                     GameData data = new GameData(
@@ -75,7 +77,35 @@ public class WebSocketService {
 
                     games.updateGameData(data);
 
+                    String newMoveMessage = sendingPlayerName + movingTeam +
+                            "made the move " + request.getMove().toDisplayString();
+                    WebsocketServer.broadcastToGame(
+                            request.getGameID(),
+                            ServerMessage.newNotification(newMoveMessage),
+                            playerSession);
+
                     WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newLoadGame(data), null);
+                    ChessGame.TeamColor activeTeam = game.getTeamTurn();
+                    String activePlayer;
+                    if (activeTeam == ChessGame.TeamColor.WHITE) {
+                        activePlayer = gameData.whiteUsername();
+                    } else {
+                        activePlayer = gameData.blackUsername();
+                    }
+
+                    if (game.isInCheckmate(activeTeam)) {
+                        String message = activePlayer + "<" + activeTeam + "> has been put in checkmate.";
+                        WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newNotification(message), null);
+                        return;
+                    }
+                    if (game.isInCheck(activeTeam)) {
+                        String message = activePlayer + "<" + activeTeam + "> has been put in check.";
+                        WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newNotification(message), null);
+                    }
+                    if (game.isInStalemate(activeTeam)) {
+                        String message = activePlayer + "<" + activeTeam + "> has been put in stalemate.";
+                        WebsocketServer.broadcastToGame(request.getGameID(), ServerMessage.newNotification(message), null);
+                    }
                 } catch (InvalidMoveException e) {
                     sendToPlayer(playerSession, ServerMessage.newErrorMessage(e.getMessage()));
                 }
