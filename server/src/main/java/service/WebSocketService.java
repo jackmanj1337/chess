@@ -61,6 +61,11 @@ public class WebSocketService {
         try {
             GameData gameData = games.getGame(request.getGameID());
             ChessGame game = gameData.game();
+            if (game.getTeamTurn() == null) {
+                sendToPlayer(playerSession, ServerMessage.newErrorMessage("The game is over."));
+                return;
+            }
+
             if (verifyAuth(playerSession) && playerIsColor(playerSession,
                     game.getBoard().getPiece(request.getMove().getStartPosition()).getTeamColor())) {
                 try {
