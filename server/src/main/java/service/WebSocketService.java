@@ -33,9 +33,9 @@ public class WebSocketService {
                 String connected = auths.getAuthFromToken(playerSession.authToken()).username();
                 GameData gameData = games.getGame(playerSession.gameID());
                 String status;
-                if (connected == gameData.whiteUsername()) {
+                if (Objects.equals(connected, gameData.whiteUsername())) {
                     status = "<WHITE>";
-                } else if (connected == gameData.blackUsername()) {
+                } else if (Objects.equals(connected, gameData.blackUsername())) {
                     status = "<BLACK>";
                 } else {
                     status = "<OBSERVER>";
@@ -148,6 +148,7 @@ public class WebSocketService {
 
             if (gameData.game().getTeamTurn() == null) {
                 sendToPlayer(playerSession, ServerMessage.newErrorMessage("The game has already been decided"));
+                return;
             }
 
             String winner = isWhite ? gameData.blackUsername() : gameData.whiteUsername();

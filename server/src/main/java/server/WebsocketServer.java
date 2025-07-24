@@ -100,6 +100,9 @@ public class WebsocketServer {
     public static void removeUserFromGame(PlayerSession session) throws DataAccessException {
         GameDAI games = DAOManager.games;
         GameData data = games.getGame(session.gameID());
+        if (data == null) {
+            throw new DataAccessException("getGame in removeUser returned null");
+        }
         AuthDAI auths = DAOManager.auths;
         AuthData authData = auths.getAuthFromToken(session.authToken());
         String username = (authData != null) ? authData.username() : null;
