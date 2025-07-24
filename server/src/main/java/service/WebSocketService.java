@@ -130,35 +130,46 @@ public class WebSocketService {
 
     public static void handleResign(PlayerSession playerSession) {
         try {
-            if (verifyAuth(playerSession) &&
-                    (playerIsColor(playerSession, ChessGame.TeamColor.WHITE) ||
-                            playerIsColor(playerSession, ChessGame.TeamColor.BLACK))) {
-                String loser = auths.getAuthFromToken(playerSession.authToken()).username();
-                GameData gameData = games.getGame(playerSession.gameID());
-                String winner = (Objects.equals(loser, gameData.whiteUsername())) ?
-                        gameData.blackUsername() : gameData.whiteUsername();
-                if (winner == null) {
-                    winner = "<NO_PLAYER_FOUND>";
-                }
-                String message = loser + "has conceded the game to " + winner;
-                broadcastToGame(playerSession.gameID(), ServerMessage.newNotification(message), null);
-
-                ChessGame endedGame = gameData.game();
-                endedGame.setTeamTurn(null);
-
-                GameData data = new GameData(
-                        gameData.gameID(),
-                        gameData.whiteUsername(),
-                        gameData.blackUsername(),
-                        gameData.gameName(),
-                        endedGame);
-
-                games.updateGameData(data);
-
-                //WebsocketServer.broadcastToGame(playerSession.gameID(), ServerMessage.newLoadGame(data), null);
-
-
+            if (!verifyAuth(playerSession)) {
+                sendToPlayer(playerSession, ServerMessage.newErrorMessage("Invalid authentication."));
+                return;
             }
+
+            boolean isWhite = playerIsColor(playerSession, ChessGame.TeamColor.WHITE);
+            boolean isBlack = playerIsColor(playerSession, ChessGame.TeamColor.BLACK);
+
+            if (!isWhite && !isBlack) {
+                sendToPlayer(playerSession, ServerMessage.newErrorMessage("Observers cannot resign."));
+                return;
+            }
+
+            String loser = auths.getAuthFromToken(playerSession.authToken()).username();
+            GameData gameData = games.getGame(playerSession.gameID());
+
+            if (gameData.game().getTeamTurn() == null) {
+                sendToPlayer(playerSession, ServerMessage.newErrorMessage("The game has already been decided"));
+            }
+
+            String winner = isWhite ? gameData.blackUsername() : gameData.whiteUsername();
+            if (winner == null) {
+                winner = "<NO_PLAYER_FOUND>";
+            }
+
+            String message = loser + " has conceded the game to " + winner;
+            broadcastToGame(playerSession.gameID(), ServerMessage.newNotification(message), null);
+
+            ChessGame endedGame = gameData.game();
+            endedGame.setTeamTurn(null);
+
+            GameData updated = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    endedGame);
+
+            games.updateGameData(updated);
+
         } catch (DataAccessException e) {
             System.out.println("Error: " + e);
             try {
@@ -169,6 +180,7 @@ public class WebSocketService {
             }
         }
     }
+
 
     public static void handleLeave(PlayerSession playerSession) {
         try {
