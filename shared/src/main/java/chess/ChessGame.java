@@ -19,6 +19,7 @@ public class ChessGame {
     private boolean blackCanKingSideCastle = true;
     private ChessPosition enPassantablePawn = null;
     private ChessPosition enPassantDestination = null;
+    private String winner = null;
 
     @SuppressWarnings("unchecked")
     private ArrayList<ChessMove>[][] allValidMoves = new ArrayList[8][8];
@@ -50,6 +51,14 @@ public class ChessGame {
     public void setTeamTurn(TeamColor team) {
         activeTeam = team;
         //validMoveCount = calculateAllValidMoves(team);
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
     }
 
     /**

@@ -97,38 +97,67 @@ public class WebsocketServer {
     }
 
 
-    public static void removeUserFromGame(PlayerSession session) throws DataAccessException {
-        GameDAI games = DAOManager.games;
-        GameData data = games.getGame(session.gameID());
-        if (data == null) {
-            throw new DataAccessException("getGame in removeUser returned null");
-        }
-        AuthDAI auths = DAOManager.auths;
-        AuthData authData = auths.getAuthFromToken(session.authToken());
-        String username = (authData != null) ? authData.username() : null;
-        String newWhite = data.whiteUsername();
-        String newBlack = data.blackUsername();
-        if (Objects.equals(username, newWhite)) {
-            newWhite = null;
-        }
-        if (Objects.equals(username, newBlack)) {
-            newBlack = null;
-        }
-        games.updateGameData(new GameData(
-                data.gameID(),
-                newWhite,
-                newBlack,
-                data.gameName(),
-                data.game()
-        ));
-        gameSessions.getOrDefault(session.gameID(), Set.of()).remove(session);
-        sessionToPlayer.remove(session.session());
-        if (session.session() != null && session.session().isOpen()) {
-            try {
-                session.session().close(200, "player left the game");
-            } catch (Exception e) {
-                System.err.println("Failed to close session: " + e.getMessage());
+    public static void removeUserFromGame(PlayerSession session) {
+        try {
+            int gameID = session.gameID();
+            Session socket = session.session();
+            String authToken = session.authToken();
+
+            // Remove from in-memory session maps
+            Set<PlayerSession> sessions = gameSessions.get(gameID);
+            if (sessions != null) {
+                sessions.remove(session);
+                if (sessions.isEmpty()) {
+                    gameSessions.remove(gameID); // optional cleanup
+                }
             }
+            sessionToPlayer.remove(socket);
+
+            // Fetch user identity
+            AuthDAI auths = DAOManager.auths;
+            AuthData authData = auths.getAuthFromToken(authToken);
+            String username = (authData != null) ? authData.username() : null;
+
+            if (username != null) {
+                // Fetch and update game if this user was a player
+                GameDAI games = DAOManager.games;
+                GameData game = games.getGame(gameID);
+
+                if (game != null) {
+                    String white = game.whiteUsername();
+                    String black = game.blackUsername();
+                    boolean changed = false;
+
+                    if (username.equals(white)) {
+                        white = null;
+                        changed = true;
+                    }
+                    if (username.equals(black)) {
+                        black = null;
+                        changed = true;
+                    }
+
+                    if (changed) {
+                        GameData updated = new GameData(gameID, white, black, game.gameName(), game.game());
+                        games.updateGameData(updated);
+                    }
+                }
+            }
+
+            // Close session if open
+            if (socket != null && socket.isOpen()) {
+                socket.close(1000, "User disconnected or left the game");
+            }
+
+            // Optional: Notify remaining users
+            if (username != null) {
+                ServerMessage message = ServerMessage.newNotification(username + " has left the game");
+                broadcastToGame(gameID, message, session);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error removing user from game: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

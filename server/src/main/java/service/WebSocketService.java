@@ -61,7 +61,7 @@ public class WebSocketService {
         try {
             GameData gameData = games.getGame(request.getGameID());
             ChessGame game = gameData.game();
-            if (game.getTeamTurn() == null) {
+            if (game.getWinner() != null) {
                 sendToPlayer(playerSession, ServerMessage.newErrorMessage("The game is over."));
                 return;
             }
@@ -129,6 +129,7 @@ public class WebSocketService {
     }
 
     public static void handleResign(PlayerSession playerSession) {
+        System.out.println("called Handle resign");
         try {
             if (!verifyAuth(playerSession)) {
                 sendToPlayer(playerSession, ServerMessage.newErrorMessage("Invalid authentication."));
@@ -146,7 +147,7 @@ public class WebSocketService {
             String loser = auths.getAuthFromToken(playerSession.authToken()).username();
             GameData gameData = games.getGame(playerSession.gameID());
 
-            if (gameData.game().getTeamTurn() == null) {
+            if (gameData.game().getWinner() != null) {
                 sendToPlayer(playerSession, ServerMessage.newErrorMessage("The game has already been decided"));
                 return;
             }
@@ -160,7 +161,7 @@ public class WebSocketService {
             broadcastToGame(playerSession.gameID(), ServerMessage.newNotification(message), null);
 
             ChessGame endedGame = gameData.game();
-            endedGame.setTeamTurn(null);
+            endedGame.setWinner(winner);
 
             GameData updated = new GameData(
                     gameData.gameID(),
