@@ -14,10 +14,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @WebSocket
@@ -35,13 +32,11 @@ public class WebsocketServer {
     }
 
     @OnWebSocketClose
-    public void onClose(Session session, int statusCode, String reason) throws DataAccessException {
-        System.out.println("WebSocket Closed: " + session + ", Reason: " + reason);
-
-        PlayerSession playerSession = sessionToPlayer.get(session);
-        if (playerSession != null) {
-            WebSocketService.handleLeave(playerSession);  // new method below
-            removeUserFromGame(playerSession);
+    public void onClose(Session session, int statusCode, String reason) {
+        System.out.println("Connection closed: " + reason);
+        PlayerSession ps = sessionToPlayer.get(session);
+        if (ps != null) {
+            removeUserFromGame(ps);
         }
     }
 
@@ -73,21 +68,33 @@ public class WebsocketServer {
         String json = GSON.toJson(message);
         Set<PlayerSession> sessions = gameSessions.getOrDefault(gameID, Set.of());
 
-        String senderToken = null;
-        if (origin != null) {
-            senderToken = origin.authToken();
-        }
+        String senderToken = origin != null ? origin.authToken() : null;
+
+        List<PlayerSession> toRemove = new ArrayList<>();
 
         for (PlayerSession s : sessions) {
-            if (s.session().isOpen() && !Objects.equals(s.authToken(), senderToken)) {
+            if (!Objects.equals(s.authToken(), senderToken)) {
                 try {
-                    s.session().getRemote().sendString(json);
+                    if (s.session().isOpen()) {
+                        s.session().getRemote().sendString(json);
+                    } else {
+                        toRemove.add(s);
+                    }
                 } catch (Exception e) {
                     System.err.println("Error sending message: " + e.getMessage());
+                    toRemove.add(s);
                 }
             }
         }
+
+        if (!toRemove.isEmpty()) {
+            sessions.removeAll(toRemove);
+            if (sessions.isEmpty()) {
+                gameSessions.remove(gameID);
+            }
+        }
     }
+
 
     public static void connectUserToGame(PlayerSession session) {
         gameSessions
@@ -103,10 +110,10 @@ public class WebsocketServer {
             Session socket = session.session();
             String authToken = session.authToken();
 
-            // Remove from in-memory session maps
+
             Set<PlayerSession> sessions = gameSessions.get(gameID);
             if (sessions != null) {
-                sessions.remove(session);
+                sessions.removeIf(ps -> Objects.equals(ps.authToken(), authToken));
                 if (sessions.isEmpty()) {
                     gameSessions.remove(gameID); // optional cleanup
                 }
@@ -119,10 +126,8 @@ public class WebsocketServer {
             String username = (authData != null) ? authData.username() : null;
 
             if (username != null) {
-                // Fetch and update game if this user was a player
                 GameDAI games = DAOManager.games;
                 GameData game = games.getGame(gameID);
-
                 if (game != null) {
                     String white = game.whiteUsername();
                     String black = game.blackUsername();
@@ -144,12 +149,10 @@ public class WebsocketServer {
                 }
             }
 
-            // Close session if open
             if (socket != null && socket.isOpen()) {
                 socket.close(1000, "User disconnected or left the game");
             }
 
-            // Optional: Notify remaining users
             if (username != null) {
                 ServerMessage message = ServerMessage.newNotification(username + " has left the game");
                 broadcastToGame(gameID, message, session);

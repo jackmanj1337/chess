@@ -192,23 +192,9 @@ public class WebSocketService {
 
 
     public static void handleLeave(PlayerSession playerSession) {
-        try {
-            if (verifyAuth(playerSession)) {
-                String user = auths.getAuthFromToken(playerSession.authToken()).username();
-                ServerMessage leaveNotification = ServerMessage.newNotification(user + " has left the game");
-                broadcastToGame(playerSession.gameID(), leaveNotification, playerSession);
-                WebsocketServer.removeUserFromGame(playerSession);
-            }
-        } catch (DataAccessException e) {
-            System.out.println("Error: " + e);
-            try {
-                ServerMessage connectionFailedError = ServerMessage.newErrorMessage(e.getMessage());
-                playerSession.session().getRemote().sendString(GSON.toJson(connectionFailedError));
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
+        WebsocketServer.removeUserFromGame(playerSession);
     }
+
 
     private static boolean verifyAuth(PlayerSession playerSession) throws DataAccessException {
         return Objects.nonNull(auths.getAuthFromToken(playerSession.authToken()));
