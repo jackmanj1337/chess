@@ -67,8 +67,13 @@ public class WebsocketServer {
         String json = GSON.toJson(message);
         Set<PlayerSession> sessions = gameSessions.getOrDefault(gameID, Set.of());
 
+        String senderToken = null;
+        if (origin != null) {
+            senderToken = origin.authToken();
+        }
+
         for (PlayerSession s : sessions) {
-            if (s.session().isOpen() && !Objects.equals(s.authToken(), origin.authToken())) {
+            if (s.session().isOpen() && !Objects.equals(s.authToken(), senderToken)) {
                 try {
                     s.session().getRemote().sendString(json);
                 } catch (Exception e) {
