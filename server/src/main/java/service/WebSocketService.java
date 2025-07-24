@@ -136,7 +136,7 @@ public class WebSocketService {
                     winner = "<NO_PLAYER_FOUND>";
                 }
                 String message = loser + "has conceded the game to " + winner;
-                broadcastToGame(playerSession.gameID(), ServerMessage.newNotification(message), playerSession);
+                broadcastToGame(playerSession.gameID(), ServerMessage.newNotification(message), null);
 
                 ChessGame endedGame = gameData.game();
                 endedGame.setTeamTurn(null);
@@ -150,7 +150,7 @@ public class WebSocketService {
 
                 games.updateGameData(data);
 
-                WebsocketServer.broadcastToGame(playerSession.gameID(), ServerMessage.newLoadGame(data), null);
+                //WebsocketServer.broadcastToGame(playerSession.gameID(), ServerMessage.newLoadGame(data), null);
 
 
             }

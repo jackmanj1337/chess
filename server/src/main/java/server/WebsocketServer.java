@@ -1,7 +1,13 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DAOManager;
+import dataaccess.DataAccessException;
+import dataaccess.dainterface.AuthDAI;
+import dataaccess.dainterface.GameDAI;
 import handlers.PlayerSession;
+import model.AuthData;
+import model.GameData;
 import service.WebSocketService;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -29,7 +35,7 @@ public class WebsocketServer {
     }
 
     @OnWebSocketClose
-    public void onClose(Session session, int statusCode, String reason) {
+    public void onClose(Session session, int statusCode, String reason) throws DataAccessException {
         System.out.println("WebSocket Closed: " + session + ", Reason: " + reason);
 
         PlayerSession playerSession = sessionToPlayer.get(session);
@@ -91,7 +97,27 @@ public class WebsocketServer {
     }
 
 
-    public static void removeUserFromGame(PlayerSession session) {
+    public static void removeUserFromGame(PlayerSession session) throws DataAccessException {
+        GameDAI games = DAOManager.games;
+        GameData data = games.getGame(session.gameID());
+        AuthDAI auths = DAOManager.auths;
+        AuthData authData = auths.getAuthFromToken(session.authToken());
+        String username = (authData != null) ? authData.username() : null;
+        String newWhite = data.whiteUsername();
+        String newBlack = data.blackUsername();
+        if (Objects.equals(username, newWhite)) {
+            newWhite = null;
+        }
+        if (Objects.equals(username, newBlack)) {
+            newBlack = null;
+        }
+        games.updateGameData(new GameData(
+                data.gameID(),
+                newWhite,
+                newBlack,
+                data.gameName(),
+                data.game()
+        ));
         gameSessions.getOrDefault(session.gameID(), Set.of()).remove(session);
         sessionToPlayer.remove(session.session());
         if (session.session() != null && session.session().isOpen()) {
