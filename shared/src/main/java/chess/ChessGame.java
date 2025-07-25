@@ -257,7 +257,7 @@ public class ChessGame {
             }
         }
         if (!moveIsValid) {
-            throw new InvalidMoveException("No legal moves exist for that piece");
+            throw new InvalidMoveException("That is not a valid move");
         }
 
         governCastle(move);

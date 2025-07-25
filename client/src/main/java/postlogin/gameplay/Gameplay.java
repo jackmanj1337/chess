@@ -67,6 +67,7 @@ public class Gameplay {
                     BoardPrinter.print(teamColor, null, gameData);
                     break;
                 case "leave":
+                    System.out.print("Returning to game selection menu.");
                     websocketFacade.sendMessage(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
                     return;
                 case "move":
@@ -75,6 +76,7 @@ public class Gameplay {
                         ChessPosition end = notationToPosition(split[2]);
                         if (start == null || end == null) {
                             badInputResponse();
+                            break;
                         }
                         ChessPiece.PieceType promotion;
                         if (split.length == 3) {

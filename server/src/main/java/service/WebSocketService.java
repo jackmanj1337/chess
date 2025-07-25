@@ -92,7 +92,7 @@ public class WebSocketService {
                     GAMES.updateGameData(data);
 
                     String newMoveMessage = sendingPlayerName + movingTeam +
-                            "made the move " + request.getMove().toDisplayString();
+                            " made the move " + request.getMove().toDisplayString();
                     WebsocketServer.broadcastToGame(
                             request.getGameID(),
                             ServerMessage.newNotification(newMoveMessage),

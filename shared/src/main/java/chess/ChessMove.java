@@ -48,7 +48,7 @@ public class ChessMove {
     }
 
     public String toDisplayString() {
-        String promotion = null;
+        String promotion = "";
         if (promotionPiece != null) {
             String pieceTypeIcon = switch (promotionPiece) {
                 case KING -> "♚";
@@ -57,8 +57,9 @@ public class ChessMove {
                 case BISHOP -> "♝";
                 case KNIGHT -> "♞";
                 case PAWN -> "♟";
+                default -> " ? ";
             };
-            promotion = " Promotion:" + pieceTypeIcon;
+            promotion = " (Promotion:" + pieceTypeIcon + ")";
         }
         return startPosition.toDisplayString() + " -> " + endPosition.toDisplayString() + promotion;
     }
