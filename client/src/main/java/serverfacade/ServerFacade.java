@@ -19,7 +19,7 @@ public class ServerFacade {
     Gson json = new Gson();
 
     public ServerFacade(String urlBase) {
-        this.httpurl = "http://" + urlBase;
+        this.httpurl = urlBase;
     }
 
     public ServerFacade() {

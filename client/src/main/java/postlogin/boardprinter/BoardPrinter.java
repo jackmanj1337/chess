@@ -10,6 +10,7 @@ import postlogin.gameplay.Gameplay;
 import java.util.Collection;
 
 import static postlogin.boardprinter.BoardSquare.*;
+import static utilities.EscapeSequences.ERASE_SCREEN;
 
 public class BoardPrinter {
 
@@ -24,6 +25,9 @@ public class BoardPrinter {
                 board[move.getEndPosition().getRow()][move.getEndPosition().getColumn()].highlightMove();
             }
         }
+
+
+        System.out.print("\n");
 
 
         if (perspective == ChessGame.TeamColor.WHITE || perspective == null) {
@@ -42,15 +46,17 @@ public class BoardPrinter {
             }
         }
 
-        if (data.game().getTeamTurn() == ChessGame.TeamColor.WHITE) {
-            System.out.print(data.whiteUsername() + "<WHITE> is the active player\n");
+        if (data.game().getWinner() == null) {
+            if (data.game().getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                System.out.print(data.whiteUsername() + "<WHITE> is the active player\n");
+            }
+            if (data.game().getTeamTurn() == ChessGame.TeamColor.BLACK) {
+                System.out.print(data.blackUsername() + "<BLACK> is the active player\n");
+            }
+        } else {
+            System.out.println(data.game().getWinner() + " has won the game.");
         }
-        if (data.game().getTeamTurn() == ChessGame.TeamColor.BLACK) {
-            System.out.print(data.blackUsername() + "<BLACK> is the active player\n");
-        }
-        if (data.game().getTeamTurn() == null) {
-            System.out.print("This Game has ended\n");
-        }
+
     }
 
     private static BoardSquare[][] getFullBoard(ChessGame game) {

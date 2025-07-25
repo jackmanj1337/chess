@@ -26,12 +26,16 @@ public class WebsocketFacade {
     private String authToken;
     private int gameID;
     private Session session;
+    private String username;
     public static final Gson GSON = new Gson();
+    private static NotificationManager notify;
 
-    public WebsocketFacade(String authToken, int gameID) {
+    public WebsocketFacade(String authToken, int gameID, String username) {
         this.gameID = gameID;
         this.authToken = authToken;
+        this.username = username;
         establishWebsocketConnection();
+        notify = new NotificationManager(username);
     }
 
     private void establishWebsocketConnection() {
@@ -60,12 +64,12 @@ public class WebsocketFacade {
 
     @OnMessage
     public void onMessage(String msg) {
-        System.out.println("Received message from server: " + msg);
+        //System.out.println("Received message from server: " + msg);
         ServerMessage message = GSON.fromJson(msg, ServerMessage.class);
         switch (message.getServerMessageType()) {
-            case NOTIFICATION -> NotificationManager.handleNotification(message.getMessage());
-            case ERROR -> NotificationManager.handleError(message.getErrorMessage());
-            case LOAD_GAME -> NotificationManager.handleLoadGame(message.getGame());
+            case NOTIFICATION -> notify.handleNotification(message.getMessage());
+            case ERROR -> notify.handleError(message.getErrorMessage());
+            case LOAD_GAME -> notify.handleLoadGame(message.getGame());
             default -> System.out.println("Unhandled message type: " + message.getServerMessageType());
         }
     }

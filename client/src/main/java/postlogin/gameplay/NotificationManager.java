@@ -5,18 +5,33 @@ import model.GameData;
 import static utilities.EscapeSequences.RESET_TEXT_COLOR;
 import static utilities.EscapeSequences.SET_TEXT_BRIGHT_RED;
 
+
 public class NotificationManager {
-    public static void handleLoadGame(GameData data) {
+
+    private String username;
+
+    public NotificationManager(String username) {
+        this.username = username;
+    }
+
+    public void handleLoadGame(GameData data) {
         Gameplay.updateGameData(data);
+        System.out.print("[" + username + "] >>> ");
     }
 
-    public static void handleNotification(String message) {
+    public void handleNotification(String message) {
+        System.out.print("\n");
         System.out.println(message);
+        System.out.print("[" + username + "] >>> ");
+
     }
 
-    public static void handleError(String errorMessage) {
+    public void handleError(String errorMessage) {
+        System.out.print("\n");
         System.out.print(SET_TEXT_BRIGHT_RED);
         System.out.println(errorMessage);
         System.out.print(RESET_TEXT_COLOR);
+        System.out.print("[" + username + "] >>> ");
+
     }
 }

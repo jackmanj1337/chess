@@ -38,7 +38,7 @@ public class Gameplay {
         this.scanner = scanner;
         this.server = server;
         Gameplay.teamColor = teamColor;
-        websocketFacade = new WebsocketFacade(authToken, gameID);
+        websocketFacade = new WebsocketFacade(authToken, gameID, username);
     }
 
     // is it working now?
@@ -87,7 +87,9 @@ public class Gameplay {
                         try {
                             gameData.game().makeMove(move);
                         } catch (InvalidMoveException e) {
-                            System.out.print(e.getMessage());
+                            System.out.print(SET_TEXT_BRIGHT_RED);
+                            System.out.println(e.getMessage());
+                            System.out.print(RESET_TEXT_COLOR);
                             goodMove = false;
                         }
                         if (goodMove) {
