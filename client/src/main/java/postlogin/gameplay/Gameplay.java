@@ -102,7 +102,26 @@ public class Gameplay {
                     }
                     break;
                 case "resign":
-                    websocketFacade.sendMessage(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID));
+
+                    System.out.print(SET_TEXT_BRIGHT_RED);
+                    System.out.println("ARE YOU SURE YOU WANT TO RESIGN? <yes>/<no>");
+                    System.out.print(RESET_TEXT_COLOR);
+
+                    if (!scanner.hasNextLine()) {
+                        System.out.println("Input stream closed. Exiting...");
+                        websocketFacade.sendMessage(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
+                        server.logout(new LogoutRequest(authToken));
+                        break;
+                    }
+
+                    String confirmation = scanner.nextLine().trim().toLowerCase();
+
+                    if (confirmation.equals("yes")) {
+                        System.out.println("Resignation confirmed");
+                        websocketFacade.sendMessage(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID));
+                    } else {
+                        System.out.println("Resignation aborted");
+                    }
                     break;
                 case "inspect":
                     if (split.length == 2) {
